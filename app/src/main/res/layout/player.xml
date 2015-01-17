@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:seekbar="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:id="@+id/player_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/center_thumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_launcher_square" />
+
+            <TextView
+                android:id="@+id/program_played_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|bottom"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="8dp"
+                android:shadowColor="@android:color/black"
+                android:shadowDy="5"
+                android:shadowRadius="12"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                tools:text="播放次数:1111" />
+        </FrameLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:background="@color/player_background"
+            android:elevation="8dp">
+
+            <com.linroid.radio.widgets.PlayPauseButton
+                android:id="@+id/btn_play_pause"
+                style="?android:borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="96dp"
+                android:layout_centerInParent="true"
+                android:background="?buttonBackground"
+                app:pauseSrc="@drawable/ic_play_arrow_white_48dp"
+                app:playSrc="@drawable/ic_pause_white_48dp" />
+
+            <ImageButton
+                android:id="@+id/btn_fast_forward"
+                style="?android:borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="96dp"
+                android:layout_centerInParent="true"
+                android:layout_toRightOf="@id/btn_play_pause"
+                android:background="?buttonBackground"
+                android:src="@drawable/ic_fast_forward_white_48dp" />
+
+            <ImageButton
+                android:id="@+id/btn_fast_rewind"
+                style="?android:borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="96dp"
+                android:layout_centerInParent="true"
+                android:layout_toLeftOf="@id/btn_play_pause"
+                android:background="?buttonBackground"
+                android:src="@drawable/ic_fast_rewind_white_48dp" />
+        </RelativeLayout>
+    </LinearLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="64dp">
+        <TextView
+            android:id="@+id/elapsed_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="2dp"
+            android:gravity="bottom"
+            android:layout_marginRight="8dp"
+            android:textColor="#ffffff"
+            android:textSize="10sp"
+            android:text="00:00 / --:--"/>
+
+        <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
+            android:id="@+id/progress_seekbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="-16dp"
+            android:layout_marginRight="-16dp"
+            android:layout_alignParentBottom="true"
+            seekbar:dsb_max="100"
+            seekbar:dsb_min="0"
+            seekbar:dsb_progressColor="#388E3C"
+            seekbar:dsb_indicatorColor="#388E3C"
+            seekbar:dsb_value="100"/>
+    </RelativeLayout>
+</FrameLayout>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="buttonBackground" format="reference"/>
+    <declare-styleable name="SlideUpPanelLayout">
+        <attr name="panelHeightH" format="dimension"/>
+        <attr name="slidingPanelOffset" format="dimension"/>
+        <attr name="initialStateB" format="enum">
+            <enum name="collapsed" value="0"/>
+            <enum name="expanded" value="1"/>
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="SlidingUpPanelLayout">
+        <attr name="panelHeight" format="dimension" />
+        <attr name="slidePanelOffset" format="dimension" />
+        <attr name="shadowHeight" format="dimension" />
+        <attr name="paralaxOffset" format="dimension" />
+        <attr name="directOffset" format="boolean" />
+        <attr name="fadeColor" format="color" />
+        <attr name="flingVelocity" format="integer" />
+        <attr name="dragView" format="reference" />
+        <attr name="dragViewClickable" format="boolean" />
+        <attr name="overlay" format="boolean"/>
+        <attr name="anchorPoint" format="float" />
+        <attr name="initialState" format="enum">
+            <enum name="expanded" value="0" />
+            <enum name="collapsed" value="1" />
+            <enum name="anchored" value="2" />
+            <enum name="hidden" value="3" />
+        </attr>
+    </declare-styleable>
+    <declare-styleable name="PlayPauseButton">
+        <!--播放状态时的图标-->
+        <attr name="playSrc" format="reference"/>
+        <!--暂停状态时的图标-->
+        <attr name="pauseSrc" format="reference"/>
+    </declare-styleable>
+</resources>

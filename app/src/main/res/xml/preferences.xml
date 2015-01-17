@@ -1,0 +1,42 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="缓存设置">
+        <EditTextPreference
+            android:title="缓存大小"
+            android:key="cache_size"
+            android:summary="100MB"/>
+        <Preference
+            android:title="清空缓存"/>
+        </PreferenceCategory>
+    <PreferenceCategory
+        android:title="链接">
+        <Preference
+            android:title="三翼校园"
+            android:summary="http://www.sky31.com">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="http://www.sky31.com"/>
+        </Preference>
+        <Preference
+            android:title="画眉小栈"
+            android:summary="http://xtuers.com">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="http://xtuers.com"/>
+        </Preference>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="关于">
+        <Preference
+            android:title="开发者"
+            android:summary="张林">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="http://linroid.com"/>
+            </Preference>
+        <Preference
+            android:title="意见反馈"
+            android:summary="linroid@gmail.com">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="mailto:linroid@gmail.com"/>
+        </Preference>
+        <Preference android:title="版本" android:summary="1.0.0"/>
+    </PreferenceCategory>
+</PreferenceScreen>
