@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">四季电台</string>
+    <string name="action_settings">软件设置</string>
+    <string name="title_activity_settings">软件设置</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="tpl_program_count">%d 个节目</string>
+    <string name="tpl_played_count">播放次数:%d</string>
+    <string name="tpl_elapsed_duration" formatted="false">%s / %s</string>
+    <string name="action_exit">退出应用</string>
+
+</resources>

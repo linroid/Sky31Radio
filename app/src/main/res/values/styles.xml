@@ -1,0 +1,35 @@
+<resources>
+
+    <style name="BaseTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:textColorPrimary">@color/primary_text</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <!--<item name="colorPrimaryText">@color/primary_text</item>-->
+        <item name="windowActionBar">false</item>
+        <!--<item name="colorPrimary">@color/colorPrimary</item>-->
+        <!--<item name="colorPrimaryDark">@color/colorPrimary</item>-->
+        <item name="android:windowNoTitle">true</item>
+        <item name="buttonBackground">?selectableItemBackgroundBorderless</item>
+
+    </style>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="BaseTheme">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:textColorPrimary">@color/primary_text</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <!--<item name="colorPrimaryText">@color/primary_text</item>-->
+
+        <item name="windowActionBar">false</item>
+        <!--<item name="colorPrimary">@color/colorPrimary</item>-->
+        <!--<item name="colorPrimaryDark">@color/colorPrimary</item>-->
+        <item name="android:windowNoTitle">true</item>
+
+    </style>
+
+</resources>

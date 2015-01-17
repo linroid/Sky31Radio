@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bottom_bar"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/player_bar_height"
+    android:background="@color/player_background"
+    android:elevation="4dp">
+    <ImageView
+        android:id="@+id/player_thumbnail"
+        android:layout_width="@dimen/player_bar_height"
+        android:layout_height="@dimen/player_bar_height"
+        android:padding="8dp"
+        android:src="@drawable/ic_launcher_square"
+        android:scaleType="centerCrop"
+        android:layout_alignParentLeft="true"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_toRightOf="@id/player_thumbnail"
+        android:layout_centerVertical="true"
+        android:orientation="vertical"
+        android:layout_toLeftOf="@+id/playPauseProgressButton"
+        android:dividerPadding="4dp">
+        <TextView
+            android:id="@+id/player_program_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#AAF1F1F1"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textStyle="bold"
+            android:text="四季电台"/>
+        <TextView
+            android:id="@+id/player_author"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#AAF1F1F1"
+            android:textSize="12sp"
+            android:text="聆听四季的声音"/>
+    </LinearLayout>
+
+    <include layout="@layout/play_pause_progress_button"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="16dp"
+        android:layout_height="32dp"
+        android:layout_width="32dp"/>
+
+</RelativeLayout>

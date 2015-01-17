@@ -1,0 +1,3 @@
+cachePath=/home/linroid/.material_design_icons
+resourcePath=src/main/res
+pattern=((fast_forward|fast_rewind|pause|play_arrow|refresh|search)_white_24dp)|((fast_forward|fast_rewind|pause|play_arrow)_white_48dp)

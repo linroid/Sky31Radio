@@ -1,0 +1,10 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="player_bar_height">56dp</dimen>
+
+    <!-- Circular Progress Bar Sizes -->
+    <item format="float" type="dimen" name="circular_progress_bar_inner_radius_ratio">3</item>
+    <item format="float" type="dimen" name="circular_progress_bar_thickness_ratio">10</item>
+</resources>

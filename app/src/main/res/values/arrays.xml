@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pager_titles">
+        <item>主播</item>
+        <item>专题</item>
+        <item>节目</item>
+    </string-array>
+</resources>
