@@ -54,7 +54,7 @@ public abstract class BaseActivity extends ActionBarActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            NavUtils.navigateUpTo(getParent(), NavUtils.getParentActivityIntent(this));
+            NavUtils.navigateUpTo (this, NavUtils.getParentActivityIntent(this));
             return true;
         }
         return super.onOptionsItemSelected(item);

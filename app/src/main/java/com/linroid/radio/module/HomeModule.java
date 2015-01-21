@@ -1,7 +1,9 @@
 package com.linroid.radio.module;
 
 
+
 import com.linroid.radio.ui.HomeActivity;
+import com.linroid.radio.ui.base.InjectableActivity;
 import com.linroid.radio.ui.fragment.AlbumListFragment;
 import com.linroid.radio.ui.fragment.AnchorListFragment;
 import com.linroid.radio.ui.fragment.PlayerFragment;
@@ -10,7 +12,6 @@ import com.linroid.radio.ui.fragment.ProgramListFragment;
 import dagger.Module;
 
 @Module(
-        addsTo = AppModule.class,
         complete = false,
         injects = {
                 HomeActivity.class,
@@ -21,9 +22,12 @@ import dagger.Module;
         }
 )
 public class HomeModule {
-    HomeActivity activity;
+    InjectableActivity activity;
 
-    public HomeModule(HomeActivity activity) {
+    public HomeModule() {
+    }
+
+    public HomeModule(InjectableActivity activity) {
         this.activity = activity;
     }
 

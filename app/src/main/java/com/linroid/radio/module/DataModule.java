@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.linroid.radio.BuildConfig;
 import com.linroid.radio.data.ApiService;
 import com.linroid.radio.data.DiskCacheManager;
-import com.linroid.radio.data.ApiDatabase;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.internal.DiskLruCache;
@@ -73,12 +72,6 @@ public class DataModule {
         }
         return cache;
     }
-    @Provides
-    @Singleton
-    ApiDatabase programDatabase(ApiService apiService, DiskCacheManager manager){
-        return new ApiDatabase(manager, apiService);
-    }
-
     @Provides
     @Singleton
     RestAdapter provideRestAdapter(Gson gson, OkHttpClient okHttpClient){

@@ -106,8 +106,16 @@ public class HomeActivity extends InjectableActivity implements AlbumAdapter.OnA
             case R.id.action_exit:
                 onExit();
                 return true;
+            case R.id.action_search:
+                navigateToSearch();
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void navigateToSearch() {
+        Intent intent = new Intent(this, SearchActivity.class);
+        startActivity(intent);
     }
 
     private void onExit() {

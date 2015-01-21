@@ -61,7 +61,7 @@ public class ProgramListFragment extends InjectableFragment implements SwipeRefr
     Subscription subscription;
     ProgramAdapter adapter;
     PublishSubject<Pagination<Program>> programRequest;
-
+    protected Map<String, String> conditions;
     int page = 1;
     Pagination pagination;
     boolean hasLoaded = false;
@@ -93,7 +93,6 @@ public class ProgramListFragment extends InjectableFragment implements SwipeRefr
         // Required empty public constructor
     }
 
-    Map<String, String> conditions;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -154,7 +153,7 @@ public class ProgramListFragment extends InjectableFragment implements SwipeRefr
         loadData(1);
     }
 
-    private void loadData(int page) {
+    public void loadData(int page) {
         if (refreshLayout != null && !refreshLayout.isRefreshing()) {
             refreshLayout.setRefreshing(true);
         }
