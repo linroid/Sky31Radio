@@ -10,6 +10,9 @@ import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Picasso.Listener;
 
+import java.io.File;
+
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -52,6 +55,18 @@ public class AppModule {
                 .loggingEnabled(false);
 //                .loggingEnabled(BuildConfig.DEBUG);
         return builder.build();
+    }
+    @Provides @Singleton @Named("Root")
+    File provideCacheDir(Context ctx){
+        return ctx.getExternalCacheDir();
+    }
+    @Provides @Singleton @Named("Http")
+    File provideHttpCacheDir(@Named("Root") File root){
+        return new File(root, "http");
+    }
+    @Provides @Singleton @Named("Data")
+    File provideDataCacheDir(@Named("Root") File data){
+        return new File(data, "data");
     }
 
 }

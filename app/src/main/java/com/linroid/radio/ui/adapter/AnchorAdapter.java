@@ -52,7 +52,7 @@ public class AnchorAdapter extends RecyclerView.Adapter<AnchorAdapter.ViewHolder
 
     @Override
     public int getItemCount() {
-        return anchorList.size();
+        return anchorList==null ? 0 : anchorList.size();
     }
 
     public void setListData(List<Anchor> listData) {

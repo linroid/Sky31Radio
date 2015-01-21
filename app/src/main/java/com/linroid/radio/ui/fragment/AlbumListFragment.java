@@ -10,8 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.gson.reflect.TypeToken;
 import com.linroid.radio.R;
 import com.linroid.radio.data.ApiService;
+import com.linroid.radio.data.DiskCacheManager;
 import com.linroid.radio.model.Album;
 import com.linroid.radio.ui.adapter.AlbumAdapter;
 import com.linroid.radio.ui.base.InjectableFragment;
@@ -24,8 +26,13 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import rx.Observable;
+import rx.Observer;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
 
@@ -38,9 +45,14 @@ public class AlbumListFragment extends InjectableFragment
     SwipeRefreshLayout refreshLayout;
 
     @Inject
+    Picasso picasso;
+    @Inject
     ApiService apiService;
     @Inject
-    Picasso picasso;
+    DiskCacheManager cacheManager;
+    boolean hasLoaded = false;
+    PublishSubject<List<Album>> albumRequest;
+    Subscription subscription;
     AlbumAdapter adapter;
     AlbumAdapter.OnAlbumSelectedListener listener;
     public static AlbumListFragment newInstance() {
@@ -57,8 +69,6 @@ public class AlbumListFragment extends InjectableFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
         adapter = new AlbumAdapter(getActivity(), picasso);
         adapter.setOnAlbumSelectedListener(listener);
         if(savedInstanceState!=null){
@@ -127,25 +137,55 @@ public class AlbumListFragment extends InjectableFragment
         if(refreshLayout!=null && !refreshLayout.isRefreshing()){
             refreshLayout.setRefreshing(true);
         }
+        if(albumRequest==null || subscription.isUnsubscribed()){
+            albumRequest = PublishSubject.create();
+            subscription = albumRequest.subscribe(observer);
+        }
+        if(!hasLoaded){
+            Observable.create(new Observable.OnSubscribe<List<Album>>() {
+                @Override
+                public void call(Subscriber<? super List<Album>> subscriber) {
+                    if (cacheManager.exits(DiskCacheManager.KEY_ALBUM)) {
+                        List<Album> albums = cacheManager.get(DiskCacheManager.KEY_ALBUM, new TypeToken<List<Album>>() {}.getType());
+                        if(albums!=null && albums.size()>0){
+                            subscriber.onNext(albums);
+                        }
+                    }
+                    subscriber.onCompleted();
+                }
+            }).subscribe(albumRequest);
+        }
         apiService.listAlbums()
+                .map(new Func1<List<Album>, List<Album>>() {
+                    @Override
+                    public List<Album> call(List<Album> albums) {
+                        cacheManager.put(DiskCacheManager.KEY_ALBUM, albums);
+                        return albums;
+                    }
+                })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Album>>() {
-                    @Override
-                    public void onCompleted() {
-                        refreshLayout.setRefreshing(false);
-                    }
-
-                    @Override
-                    public void onError(Throwable throwable) {
-                        onCompleted();
-                        Timber.e(throwable, "发生错误: %s", throwable.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(List<Album> albums) {
-                        adapter.setListData(albums);
-                        adapter.notifyDataSetChanged();
-                    }
-                });
+                .subscribe(albumRequest);
     }
+
+    Observer<List<Album>> observer = new Observer<List<Album>>() {
+        @Override
+        public void onCompleted() {
+            if(refreshLayout!=null && refreshLayout.isRefreshing()){
+                refreshLayout.setRefreshing(false);
+            }
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            onCompleted();
+            Timber.e(throwable, "发生错误: %s", throwable.getMessage());
+        }
+
+        @Override
+        public void onNext(List<Album> albums) {
+            hasLoaded = true;
+            adapter.setListData(albums);
+            adapter.notifyDataSetChanged();
+        }
+    };
 }

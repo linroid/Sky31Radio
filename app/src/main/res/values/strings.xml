@@ -9,5 +9,7 @@
     <string name="tpl_played_count">播放次数:%d</string>
     <string name="tpl_elapsed_duration" formatted="false">%s / %s</string>
     <string name="action_exit">退出</string>
+    <string name="title_activity_search">节目搜索</string>
+    <string name="action_search">搜索节目</string>
 
 </resources>

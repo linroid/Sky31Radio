@@ -350,7 +350,9 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
 
         @Override
         public void onBufferingUpdate(MediaPlayer mp, int percent) {
-            Timber.i("update secondaryProgress " + percent);
+            if(percent == 100){
+                Timber.d("buffer complete");
+            }
         }
 
         @Override

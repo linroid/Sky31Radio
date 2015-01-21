@@ -1,14 +1,18 @@
 package com.linroid.radio.module;
 
-import android.content.Context;
-
 import com.google.gson.Gson;
+import com.linroid.radio.BuildConfig;
 import com.linroid.radio.data.ApiService;
+import com.linroid.radio.data.DiskCacheManager;
+import com.linroid.radio.data.ApiDatabase;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.internal.DiskLruCache;
 
+import java.io.File;
 import java.io.IOException;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -43,15 +47,36 @@ public class DataModule {
     }
     @Provides
     @Singleton
-    Cache provideHttpCache(Context ctx) {
+    Cache provideHttpCache(@Named("Http") File httpCacheDir) {
         //100M;
         int cacheSize = 1024*1024*100;
         try {
-            return new Cache(ctx.getExternalCacheDir(), cacheSize);
+            return new Cache(httpCacheDir, cacheSize);
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
+        }catch (Exception e){
+            Timber.e("install http cache false");
         }
+
+        return null;
+    }
+    @Provides
+    @Singleton
+    DiskLruCache provideDataCache(@Named("Data") File cacheDir){
+        DiskLruCache cache = null;
+        try {
+            //10M
+            cache = DiskLruCache.open(cacheDir, BuildConfig.VERSION_CODE, 1, 1024 * 1024 * 10);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Timber.e(e, "install data cache failed");
+        }
+        return cache;
+    }
+    @Provides
+    @Singleton
+    ApiDatabase programDatabase(ApiService apiService, DiskCacheManager manager){
+        return new ApiDatabase(manager, apiService);
     }
 
     @Provides

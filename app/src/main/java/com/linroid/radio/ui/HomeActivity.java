@@ -112,7 +112,7 @@ public class HomeActivity extends InjectableActivity implements AlbumAdapter.OnA
 
     private void onExit() {
         RadioUtils.stop(this);
-        super.onBackPressed();
+        finish();
     }
 
     private void openSettingsActivity() {

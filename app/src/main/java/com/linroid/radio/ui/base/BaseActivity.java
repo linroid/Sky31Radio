@@ -3,8 +3,10 @@ package com.linroid.radio.ui.base;
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 
 import com.linroid.radio.R;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
@@ -48,6 +50,15 @@ public abstract class BaseActivity extends ActionBarActivity {
 
     }
     protected abstract int provideContentViewId();
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            NavUtils.navigateUpTo(getParent(), NavUtils.getParentActivityIntent(this));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onStop() {

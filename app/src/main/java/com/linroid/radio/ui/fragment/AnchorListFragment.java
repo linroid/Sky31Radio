@@ -10,13 +10,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.gson.reflect.TypeToken;
 import com.linroid.radio.R;
 import com.linroid.radio.data.ApiService;
+import com.linroid.radio.data.DiskCacheManager;
 import com.linroid.radio.model.Anchor;
 import com.linroid.radio.ui.adapter.AnchorAdapter;
 import com.linroid.radio.ui.base.InjectableFragment;
 import com.squareup.picasso.Picasso;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +27,13 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import rx.Observable;
+import rx.Observer;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
 
@@ -46,6 +54,12 @@ public class AnchorListFragment extends InjectableFragment implements SwipeRefre
     ApiService apiService;
     @Inject
     Picasso picasso;
+    @Inject
+    DiskCacheManager cacheManager;
+
+    boolean hasLoaded = false;
+    Subscription subscription;
+    PublishSubject<List<Anchor>> anchorRequest;
     AnchorAdapter adapter;
     AnchorAdapter.OnAnchorSelectedListener listener;
 
@@ -125,25 +139,57 @@ public class AnchorListFragment extends InjectableFragment implements SwipeRefre
         if(refreshLayout!=null && !refreshLayout.isRefreshing()){
             refreshLayout.setRefreshing(true);
         }
+        if(anchorRequest==null || subscription.isUnsubscribed()){
+            anchorRequest = PublishSubject.create();
+            subscription = anchorRequest.subscribe(observer);
+        }
+        if(!hasLoaded){
+            Observable.create(new Observable.OnSubscribe<List<Anchor>>() {
+                @Override
+                public void call(Subscriber<? super List<Anchor>> subscriber) {
+                    if (cacheManager.exits(DiskCacheManager.KEY_ANCHOR)) {
+                        Type type = new TypeToken<List<Anchor>>() { }.getType();
+                        List<Anchor> cachedData = cacheManager.get(DiskCacheManager.KEY_ANCHOR, type);
+                        Timber.d("load data from cached file successful!");
+                        if(cachedData!=null && cachedData.size()>0) {
+                            subscriber.onNext(cachedData);
+                        }
+                    }
+                    subscriber.onCompleted();
+                }
+            }).subscribe(anchorRequest);
+        }
         apiService.listAnchor()
+                .map(new Func1<List<Anchor>, List<Anchor>>() {
+                    @Override
+                    public List<Anchor> call(List<Anchor> anchors) {
+                        cacheManager.put(DiskCacheManager.KEY_ANCHOR, anchors);
+                        return anchors;
+                    }
+                })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Anchor>>() {
-                    @Override
-                    public void onCompleted() {
-                        refreshLayout.setRefreshing(false);
-                    }
-
-                    @Override
-                    public void onError(Throwable throwable) {
-                        onCompleted();
-                        Timber.e(throwable, "发生错误: %s", throwable.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(List<Anchor> anchors) {
-                        adapter.setListData(anchors);
-                        adapter.notifyDataSetChanged();
-                    }
-                });
+                .subscribe(anchorRequest);
     }
+    Observer<List<Anchor>> observer = new Observer<List<Anchor>>() {
+        @Override
+        public void onCompleted() {
+            if(refreshLayout!=null && !refreshLayout.isRefreshing()){
+                refreshLayout.setRefreshing(false);
+            }
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            onCompleted();
+            Timber.e(throwable, "发生错误: %s", throwable.getMessage());
+        }
+
+        @Override
+        public void onNext(List<Anchor> anchors) {
+            Timber.d("onNext %s", anchors.toString());
+            hasLoaded = true;
+            adapter.setListData(anchors);
+            adapter.notifyDataSetChanged();
+        }
+    };
 }

@@ -54,7 +54,7 @@ public class ProgramAdapter extends RecyclerView.Adapter<ProgramAdapter.ViewHold
 
     @Override
     public int getItemCount() {
-        return programList.size();
+        return programList==null ? 0 :  programList.size();
     }
 
     public void setListData(List listData) {

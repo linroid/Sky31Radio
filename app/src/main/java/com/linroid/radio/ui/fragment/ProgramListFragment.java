@@ -9,8 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.gson.reflect.TypeToken;
 import com.linroid.radio.R;
 import com.linroid.radio.data.ApiService;
+import com.linroid.radio.data.DiskCacheManager;
 import com.linroid.radio.model.Album;
 import com.linroid.radio.model.Anchor;
 import com.linroid.radio.model.Pagination;
@@ -20,6 +22,7 @@ import com.linroid.radio.ui.base.InjectableFragment;
 import com.linroid.radio.widgets.DividerItemDecoration;
 import com.squareup.picasso.Picasso;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,8 +32,13 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import rx.Observable;
+import rx.Observer;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
 
@@ -44,14 +52,19 @@ public class ProgramListFragment extends InjectableFragment implements SwipeRefr
     SwipeRefreshLayout refreshLayout;
 
     @Inject
-    ApiService apiService;
-    @Inject
     Picasso picasso;
+    @Inject
+    DiskCacheManager cacheManager;
+    @Inject
+    ApiService apiService;
 
+    Subscription subscription;
     ProgramAdapter adapter;
+    PublishSubject<Pagination<Program>> programRequest;
 
     int page = 1;
     Pagination pagination;
+    boolean hasLoaded = false;
 
     public static ProgramListFragment newInstance() {
         ProgramListFragment fragment = new ProgramListFragment();
@@ -75,28 +88,30 @@ public class ProgramListFragment extends InjectableFragment implements SwipeRefr
         fragment.setArguments(args);
         return fragment;
     }
+
     public ProgramListFragment() {
         // Required empty public constructor
     }
 
     Map<String, String> conditions;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         conditions = new HashMap<>();
         Bundle data = getArguments();
-        if(data!=null){
-            if(data.containsKey(EXTRA_ALBUM)){
+        if (data != null) {
+            if (data.containsKey(EXTRA_ALBUM)) {
                 Album album = data.getParcelable(EXTRA_ALBUM);
                 conditions.put("album_id", String.valueOf(album.getId()));
             }
-            if(data.containsKey(EXTRA_ANCHOR)){
+            if (data.containsKey(EXTRA_ANCHOR)) {
                 Anchor anchor = data.getParcelable(EXTRA_ANCHOR);
                 conditions.put("user_id", String.valueOf(anchor.getId()));
             }
         }
         adapter = new ProgramAdapter(picasso);
-        if(savedInstanceState!=null){
+        if (savedInstanceState != null) {
             List<Program> programList = savedInstanceState.getParcelableArrayList(KEY_PROGRAM);
             adapter.setListData(programList);
         }
@@ -115,7 +130,7 @@ public class ProgramListFragment extends InjectableFragment implements SwipeRefr
                              Bundle savedInstanceState) {
         Timber.i("onCreateView");
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_program_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_program_list, container, false);
         ButterKnife.inject(this, view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -140,48 +155,83 @@ public class ProgramListFragment extends InjectableFragment implements SwipeRefr
     }
 
     private void loadData(int page) {
-        if(refreshLayout!=null && !refreshLayout.isRefreshing()){
+        if (refreshLayout != null && !refreshLayout.isRefreshing()) {
             refreshLayout.setRefreshing(true);
         }
-        apiService.listPrograms(page, conditions)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Pagination<Program>>() {
-                    @Override
-                    public void onCompleted() {
-                        Timber.i("listPrograms onCompleted");
-                        refreshLayout.setRefreshing(false);
-                    }
-
-                    @Override
-                    public void onError(Throwable throwable) {
-                        Timber.e(throwable, "listPrograms onError");
-                        onCompleted();
-                    }
-
-                    @Override
-                    public void onNext(Pagination<Program> data) {
-                        Timber.i("listPrograms onNext, total:%d", data.getTotal());
-                        if(data.getCurrentPage() > 1){
-                            int previousIndex = adapter.getProgramList().size();
-                            adapter.addMoreData(data.getData());
-                            adapter.notifyItemRangeInserted(previousIndex, data.getData().size());
-                        }else{
-                            adapter.setListData(data.getData());
-                            adapter.notifyDataSetChanged();
+        if(programRequest==null || subscription.isUnsubscribed()){
+            programRequest = PublishSubject.create();
+            subscription = programRequest.subscribe(observer);
+        }
+        if(!hasLoaded && conditions.size()==0){
+            Observable.create(new Observable.OnSubscribe<Pagination<Program>>() {
+                @Override
+                public void call(Subscriber<? super Pagination<Program>> subscriber) {
+                    if (cacheManager.exits(DiskCacheManager.KEY_PROGRAM)) {
+                        Type type = new TypeToken<Pagination<Program>>() {}.getType();
+                        Pagination<Program> cachedData = cacheManager.get(DiskCacheManager.KEY_PROGRAM, type);
+                        Timber.d("load data from cached file successful!");
+                        if(cachedData!=null) {
+                            subscriber.onNext(cachedData);
                         }
-                        data.setData(null);
-                        pagination = data;
-
                     }
-                });
+//                    observer.onCompleted();
+                }
+            }).subscribe(programRequest);
+        }
+        apiService.listPrograms(page, conditions)
+                .map(new Func1<Pagination<Program>, Pagination<Program>>() {
+                    @Override
+                    public Pagination<Program> call(Pagination<Program> programPagination) {
+                        if(programPagination.getCurrentPage() == 1  && conditions.size()==0){
+                            cacheManager.put(DiskCacheManager.KEY_PROGRAM, programPagination);
+                        }
+                        Timber.d("subscription isUnsubscribed: %s", subscription.isUnsubscribed());
+                        return programPagination;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(programRequest);
     }
+
     @Override
     public boolean hasMore() {
-        return pagination!=null&&(pagination.getCurrentPage()<pagination.getLastPage());
+        return pagination != null && (pagination.getCurrentPage() < pagination.getLastPage());
     }
 
     @Override
     public void onLoadMore() {
-        loadData(pagination.getCurrentPage()+1);
+        loadData(pagination.getCurrentPage() + 1);
     }
+
+    Observer observer = new Observer<Pagination<Program>>() {
+        @Override
+        public void onCompleted() {
+            Timber.i("listPrograms onCompleted");
+            if(refreshLayout!=null && refreshLayout.isRefreshing()){
+                refreshLayout.setRefreshing(false);
+            }
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            Timber.e(throwable, "listPrograms onError");
+            onCompleted();
+        }
+
+        @Override
+        public void onNext(Pagination<Program> data) {
+            hasLoaded = true;
+            Timber.i("listPrograms onNext, total:%d", data.getTotal());
+            if (data.getCurrentPage() > 1) {
+                int previousIndex = adapter.getProgramList().size();
+                adapter.addMoreData(data.getData());
+                adapter.notifyItemRangeInserted(previousIndex, data.getData().size());
+            } else {
+                adapter.setListData(data.getData());
+                adapter.notifyDataSetChanged();
+            }
+            data.setData(null);
+            pagination = data;
+        }
+    };
 }
