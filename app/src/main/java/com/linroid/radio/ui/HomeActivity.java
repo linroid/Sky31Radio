@@ -20,6 +20,7 @@ import com.linroid.radio.ui.base.InjectableActivity;
 import com.linroid.radio.ui.fragment.ProgramListFragment;
 import com.linroid.radio.utils.RadioUtils;
 import com.linroid.radio.widgets.SlidingUpPanelLayout;
+import com.linroid.radio.widgets.TitleSwitcher;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,18 +32,6 @@ import timber.log.Timber;
  * Created by linroid on 1/14/15.
  */
 public class HomeActivity extends InjectableActivity implements AlbumAdapter.OnAlbumSelectedListener, AnchorAdapter.OnAnchorSelectedListener{
-    public static final String INTENT_RECEIVER_UPDATE_PROGRESS = "com.linroid.radio.action.intent.receiver.update.progress";
-
-    public static final String INTENT_RECEIVER_GET_PLAYING_SONG = "com.xtuers.android.radio.receiver.GetPlayingSong";
-
-    public static final String KEY_PROGRESS = "progress";
-    public static final String KEY_CACHE_PROGRESS = "cache_progress";
-    public static final String KEY_DURATION_STR = "duration_str";
-    public static final String KEY_PROGRESS_STR = "progress_str";
-    public static final String KEY_PROGRAM =  "program";
-    public static final String KEY_PERCENT =  "percent";
-    public static final String KEY_CONTROL =  "control";
-
     public static final String STATE_PAGER_CURRENT_ITEM = "pager_current_item";
     public static final int DEFAULT_PAGER_CURRENT_ITEM = 2;
     @InjectView(R.id.tab_strip)
@@ -56,6 +45,7 @@ public class HomeActivity extends InjectableActivity implements AlbumAdapter.OnA
 
     HomePagerAdapter pagerAdapter;
 
+    TitleSwitcher titleSwitcher;
     boolean detail = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +56,9 @@ public class HomeActivity extends InjectableActivity implements AlbumAdapter.OnA
             currentItem = savedInstanceState.getInt(STATE_PAGER_CURRENT_ITEM);
         }
         viewPager.setCurrentItem(currentItem);
+        titleSwitcher = new TitleSwitcher(this);
+        titleSwitcher.setToolbar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
     @Override
@@ -77,6 +70,8 @@ public class HomeActivity extends InjectableActivity implements AlbumAdapter.OnA
         pagerAdapter = new HomePagerAdapter(this, getSupportFragmentManager());
         viewPager.setAdapter(pagerAdapter);
         tabStrip.setViewPager(viewPager);
+//        ViewPagerObserver vpo = new ViewPagerObserver(viewPager);
+//        vpo.addObservableView(titleIndicator);
     }
 
     @Override
@@ -123,7 +118,7 @@ public class HomeActivity extends InjectableActivity implements AlbumAdapter.OnA
     private void openSettingsActivity() {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
-        overridePendingTransition(R.anim.abc_slide_in_bottom, R.anim.abc_slide_out_top);
+//        overridePendingTransition(R.anim.activity_slide_in, R.anim.activity_slide_out);
     }
 
     @Override
@@ -132,7 +127,7 @@ public class HomeActivity extends InjectableActivity implements AlbumAdapter.OnA
         detail = true;
         ViewCompat.setElevation(homeContainer, 0);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(album.getName());
+        titleSwitcher.switchForward(album.getName());
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.home_container, ProgramListFragment.newInstance(album), "album")
@@ -147,7 +142,7 @@ public class HomeActivity extends InjectableActivity implements AlbumAdapter.OnA
         detail = true;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ViewCompat.setElevation(homeContainer, 0);
-        getSupportActionBar().setTitle(anchor.getNickname());
+        titleSwitcher.switchForward(anchor.getNickname());
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.home_container, ProgramListFragment.newInstance(anchor), "anchor")
@@ -170,7 +165,20 @@ public class HomeActivity extends InjectableActivity implements AlbumAdapter.OnA
     private void restoreActionBar(){
         detail = false;
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        getSupportActionBar().setTitle(getTitle());
+        titleSwitcher.switchBack(getTitle());
         ViewCompat.setElevation(homeContainer, getSupportActionBar().getElevation());
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        if(toolbar!=null && titleSwitcher!=null){
+            titleSwitcher.setCurrentTitle(title);
+        }else{
+            super.setTitle(title);
+        }
+    }
+    @Override
+    public void setTitle(int titleId) {
+        setTitle(getText(titleId));
     }
 }

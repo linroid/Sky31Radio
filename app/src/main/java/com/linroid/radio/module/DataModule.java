@@ -68,7 +68,7 @@ public class DataModule {
                 .setClient(new OkClient(okHttpClient))
                 .setConverter(new GsonConverter(gson))
                 .setLogLevel(RestAdapter.LogLevel.BASIC)
-                .setEndpoint("http://newradio.sky31.com/api")
+                .setEndpoint("http://radio.sky31.com/api")
                 .build();
     }
     @Provides

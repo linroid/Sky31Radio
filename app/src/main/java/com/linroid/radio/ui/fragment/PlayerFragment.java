@@ -29,6 +29,7 @@ import com.linroid.radio.IRadioService;
 import com.linroid.radio.R;
 import com.linroid.radio.model.Program;
 import com.linroid.radio.service.RadioPlaybackService;
+import com.linroid.radio.ui.base.BaseActivity;
 import com.linroid.radio.ui.base.InjectableFragment;
 import com.linroid.radio.utils.BlurTransformation;
 import com.linroid.radio.utils.RadioUtils;
@@ -39,6 +40,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
+import org.michaelevans.colorart.library.ColorArt;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -117,7 +119,6 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
                     break;
                 case MSG_SEEK:
                     RadioUtils.seekToPosition(seekbar.getContext(), msg.arg1);
-                    msg.recycle();
                     break;
             }
         }
@@ -166,6 +167,8 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
                     @Override
                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                         playerRootView.setBackgroundDrawable(new BitmapDrawable(bitmap));
+                        ColorArt colorArt = new ColorArt(bitmap);
+                        ((BaseActivity)getActivity()).setStatusColor(colorArt.getBackgroundColor());
                     }
 
                     @Override
@@ -322,20 +325,25 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
         }
     }
     SlidingUpPanelLayout.PanelSlideListener mSlidingListener = new SlidingUpPanelLayout.SimplePanelSlideListener() {
+        float previousOffset = 1.f;
         @Override
         public void onPanelSlide(View panel, float slideOffset) {
+            if(previousOffset>slideOffset){
+                playPauseProgressButton.setVisibility(View.VISIBLE);
+            }
+            previousOffset = slideOffset;
             playPauseProgressButton.setScaleX(1-slideOffset);
             playPauseProgressButton.setScaleY(1-slideOffset);
         }
 
         @Override
         public void onPanelCollapsed(View panel) {
-//            playPauseProgressButton.setVisibility(View.VISIBLE);
+            playPauseProgressButton.setVisibility(View.VISIBLE);
         }
 
         @Override
         public void onPanelExpanded(View panel) {
-//            playPauseProgressButton.setVisibility(View.GONE);
+            playPauseProgressButton.setVisibility(View.GONE);
         }
     };
 

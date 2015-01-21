@@ -223,24 +223,30 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
         switch (focusChange) {
             case AudioManager.AUDIOFOCUS_GAIN:
                 // resume playback
-                player.play();
+                Timber.i("AudioManager.AUDIOFOCUS_GAIN");
+//                player.play();
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS:
                 // Lost focus for an unbounded amount of time: stop playback and release media player
-                player.stop();
+                Timber.i("AudioManager.AUDIOFOCUS_LOSS");
+                if(player!=null){
+                    player.stop();
+                }
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 // Lost focus for a short time, but we have to stop
                 // playback. We don't release the media player because playback
                 // is likely to resume
+                Timber.i("AudioManager.AUDIOFOCUS_LOSS_TRANSIENT");
                 player.pause();
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                 // Lost focus for a short time, but it's ok to keep playing
                 // at an attenuated level
+                Timber.i("AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK");
                 break;
         }
     }
@@ -278,7 +284,7 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
         }
 
         public boolean isPlaying(){
-            return isPlaying || mediaPlayer.isPlaying();
+            return mediaPlayer!=null && (isPlaying||mediaPlayer.isPlaying());
         }
         public void pause() {
             Timber.d("player pause");
