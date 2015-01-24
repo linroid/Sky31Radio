@@ -19,7 +19,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
-            tools:src="@drawable/ic_launcher"/>
+            android:scaleType="centerCrop"
+            tools:src="@drawable/ic_launcher_square"/>
         <TextView
             android:id="@+id/album_name"
             android:layout_width="wrap_content"

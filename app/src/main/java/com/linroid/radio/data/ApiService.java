@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import retrofit.http.GET;
+import retrofit.http.Path;
 import retrofit.http.Query;
 import retrofit.http.QueryMap;
 import rx.Observable;
@@ -24,4 +25,7 @@ public interface ApiService {
 
     @GET("/anchor")
     Observable<List<Anchor>> listAnchor();
+
+    @GET("/program/{id}")
+    Observable<Program> programDetail(@Path("id") int programId);
 }

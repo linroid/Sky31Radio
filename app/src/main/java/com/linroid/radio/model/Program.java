@@ -32,6 +32,8 @@ public class Program implements Parcelable {
     @Expose
     private String thumbnail;
     @Expose
+    private String article;
+    @Expose
     private String background;
     @SerializedName("total_play")
     @Expose
@@ -129,6 +131,14 @@ public class Program implements Parcelable {
      */
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public String getArticle() {
+        return article;
+    }
+
+    public void setArticle(String article) {
+        this.article = article;
     }
 
     /**
@@ -276,6 +286,9 @@ public class Program implements Parcelable {
     }
 
 
+    public Program() {
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -292,13 +305,11 @@ public class Program implements Parcelable {
         dest.writeString(this.updatedAt);
         dest.writeString(this.cover);
         dest.writeString(this.thumbnail);
+        dest.writeString(this.article);
         dest.writeString(this.background);
-        dest.writeValue(this.totalPlay);
-        dest.writeParcelable(this.audio, flags);
-        dest.writeParcelable(this.album, flags);
-    }
-
-    public Program() {
+        dest.writeInt(this.totalPlay);
+        dest.writeParcelable(this.audio, 0);
+        dest.writeParcelable(this.album, 0);
     }
 
     private Program(Parcel in) {
@@ -311,13 +322,14 @@ public class Program implements Parcelable {
         this.updatedAt = in.readString();
         this.cover = in.readString();
         this.thumbnail = in.readString();
+        this.article = in.readString();
         this.background = in.readString();
-        this.totalPlay = (int) in.readValue(int.class.getClassLoader());
+        this.totalPlay = in.readInt();
         this.audio = in.readParcelable(Audio.class.getClassLoader());
         this.album = in.readParcelable(Album.class.getClassLoader());
     }
 
-    public static final Parcelable.Creator<Program> CREATOR = new Parcelable.Creator<Program>() {
+    public static final Creator<Program> CREATOR = new Creator<Program>() {
         public Program createFromParcel(Parcel source) {
             return new Program(source);
         }

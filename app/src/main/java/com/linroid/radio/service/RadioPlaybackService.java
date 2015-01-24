@@ -266,8 +266,7 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
             mediaPlayer.setScreenOnWhilePlaying(true);
             mediaPlayer.setOnErrorListener(this);
             mediaPlayer.setOnCompletionListener(this);
-            mediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
-
+            mediaPlayer.setWakeMode(RadioPlaybackService.this, PowerManager.PARTIAL_WAKE_LOCK);
         }
 
         public void start() {
@@ -399,6 +398,9 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
             return programList.get(playingIndex);
         }
 
+        public int getSessionId() {
+            return mediaPlayer.getAudioSessionId();
+        }
     }
     IBinder mBinder = new IRadioService.Stub() {
 
@@ -448,6 +450,11 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
         }
 
         @Override
+        public int getPlayerSessionId() throws RemoteException {
+            return player.getSessionId();
+        }
+
+        @Override
         public boolean isPlaying() throws RemoteException {
             return player!=null && player.isPlaying();
         }
@@ -460,7 +467,7 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
     private class PlayerReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Timber.i("onReceive, Intent: %s", intent.toString());
+            Timber.i("onReceive, Intent: %s, Extras:%s", intent.toString(), intent.getExtras()==null ? null : intent.getExtras().toString());
             switch (intent.getAction()) {
                 case ACTION_PLAY:
                     player.play();
@@ -473,6 +480,7 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
                     break;
                 case ACTION_SEEK_TO_POSITION:
                     int position = intent.getIntExtra(EXTRA_POSITION, 0);
+                    Timber.d("ACTION_SEEK_TO_POSITION, position:%d", position);
                     player.seekToPosition(position);
                     break;
                 case ACTION_SEEK_TO_PERCENT:

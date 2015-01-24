@@ -11,6 +11,7 @@ interface IRadioService {
     void previous();
     long getDuration();
     long getPosition();
+    int getPlayerSessionId();
     boolean isPlaying();
     Program getPlayingProgram();
 }

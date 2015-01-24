@@ -2,10 +2,11 @@ package com.linroid.radio.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.support.v8.renderscript.Allocation;
-import android.support.v8.renderscript.Element;
-import android.support.v8.renderscript.RenderScript;
-import android.support.v8.renderscript.ScriptIntrinsicBlur;
+import android.os.Build;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 
 import com.squareup.picasso.Transformation;
 
@@ -27,17 +28,22 @@ public class BlurTransformation implements Transformation {
     public Bitmap transform(Bitmap source) {
         Timber.i("start bitmap transform");
         try {
-            //                    Bitmap outputBitmap = Bitmap.createBitmap(centerThumbnailIV.getWidth(), centerThumbnailIV.getHeight(), Bitmap.Config.ARGB_8888);
-            Bitmap outputBitmap = Bitmap.createBitmap(source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);
-            RenderScript rs = RenderScript.create(ctx);
-            ScriptIntrinsicBlur sib = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
-            Allocation tmpIn = Allocation.createFromBitmap(rs, source);
-            Allocation tmpOut = Allocation.createFromBitmap(rs, outputBitmap);
-            sib.setRadius(20f);
-            sib.setInput(tmpIn);
-            sib.forEach(tmpOut);
-            tmpOut.copyTo(outputBitmap);
-            source.recycle();
+            float radius = 20f;
+            Bitmap outputBitmap;
+            if(Build.VERSION.SDK_INT >= 17){
+                outputBitmap = Bitmap.createBitmap(source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);
+                RenderScript rs = RenderScript.create(ctx);
+                ScriptIntrinsicBlur sib = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
+                Allocation tmpIn = Allocation.createFromBitmap(rs, source);
+                Allocation tmpOut = Allocation.createFromBitmap(rs, outputBitmap);
+                sib.setRadius(radius);
+                sib.setInput(tmpIn);
+                sib.forEach(tmpOut);
+                tmpOut.copyTo(outputBitmap);
+                source.recycle();
+            }else{
+                outputBitmap = FastBlur.doBlur(source, (int) radius, true);
+            }
             Timber.d("blur bitmap success");
             return outputBitmap;
         } catch (Exception e) {

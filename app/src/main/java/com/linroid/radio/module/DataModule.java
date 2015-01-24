@@ -1,12 +1,16 @@
 package com.linroid.radio.module;
 
+import android.content.Context;
+import android.net.Uri;
+
 import com.google.gson.Gson;
 import com.linroid.radio.BuildConfig;
 import com.linroid.radio.data.ApiService;
-import com.linroid.radio.data.DiskCacheManager;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.internal.DiskLruCache;
+import com.squareup.picasso.OkHttpDownloader;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +41,20 @@ public class DataModule {
         return new Gson();
     }
 
+    @Provides
+    @Singleton
+    Picasso providePicasso(OkHttpClient okHttpClient, Context ctx) {
+        Picasso.Builder builder = new Picasso.Builder(ctx);
+        builder.downloader(new OkHttpDownloader(okHttpClient))
+                .listener(new Picasso.Listener() {
+                    public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                        Timber.e(exception, "Picasso load image failed: " + uri.toString());
+                    }
+                })
+                .indicatorsEnabled(false)
+                .loggingEnabled(false);
+        return builder.build();
+    }
     @Provides
     @Singleton
     OkHttpClient provideOkHttp(Cache cache) {

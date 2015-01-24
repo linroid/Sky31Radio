@@ -62,6 +62,9 @@ public class BaseFragment extends Fragment {
         Timber.i("onPause");
     }
 
+    public void setStatusColor(int color){
+        ((BaseActivity) getActivity()).setStatusColor(color);
+    }
     @Override
     public void onStart() {
         super.onStart();

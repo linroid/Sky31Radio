@@ -35,4 +35,8 @@
         <!--暂停状态时的图标-->
         <attr name="pauseSrc" format="reference"/>
     </declare-styleable>
+
+    <declare-styleable name="VisualizerView">
+        <attr name="waveColor" format="color|reference"/>
+    </declare-styleable>
 </resources>
