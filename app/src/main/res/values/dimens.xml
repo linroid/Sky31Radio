@@ -3,6 +3,8 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="player_bar_height">56dp</dimen>
+    <dimen name="strip_height">48dp</dimen>
+    <dimen name="shadow_height">5dp</dimen>
 
     <!-- Circular Progress Bar Sizes -->
     <item format="float" type="dimen" name="circular_progress_bar_inner_radius_ratio">3</item>

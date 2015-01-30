@@ -37,6 +37,7 @@
             <intent android:action="android.intent.action.VIEW"
                 android:data="mailto:linroid@gmail.com"/>
         </Preference>
-        <Preference android:title="版本" android:summary="1.0.0"/>
+        <Preference  android:key="@string/pref_version_ame" android:title="版本"/>
+        <Preference  android:key="@string/pref_build_time" android:title="构建时间"/>
     </PreferenceCategory>
 </PreferenceScreen>

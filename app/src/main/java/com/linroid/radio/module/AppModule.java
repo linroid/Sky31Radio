@@ -38,7 +38,7 @@ public class AppModule {
 
     @Provides @Singleton @Named("Root")
     File provideCacheDir(Context ctx){
-        return ctx.getExternalCacheDir();
+        return ctx.getCacheDir();
     }
     @Provides @Singleton @Named("Http")
     File provideHttpCacheDir(@Named("Root") File root){

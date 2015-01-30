@@ -185,12 +185,14 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
         playerAuthorTV.setText(program.getAuthor());
         playerProgramNameTV.setText(program.getTitle());
         articleTV.setText(R.string.loading_article);
-        picasso.load(program.getThumbnail()).into(playerThumbnailIV);
-        picasso.load(program.getThumbnail()).into(centerThumbnailIV);
+//        picasso.load(program.getThumbnail()).into(playerThumbnailIV);
+//        picasso.load(program.getThumbnail()).into(centerThumbnailIV);
         picasso.load(program.getThumbnail())
                 .into(new Target() {
                     @Override
                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                        playerThumbnailIV.setImageBitmap(bitmap);
+                        centerThumbnailIV.setImageBitmap(bitmap);
                         Timber.d("onBitmapLoaded:%s(%s)", from.name(), bitmap.toString());
                         ColorArt colorArt = new ColorArt(bitmap);
 //                        articleTV.setTextColor(colorArt.getDetailColor());
@@ -297,7 +299,7 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_player, container, false);
         ButterKnife.inject(this, view);
-        articleTV.setMovementMethod(new ScrollingMovementMethod());
+        articleTV.setMovementMethod(ScrollingMovementMethod.getInstance());
         playPauseButton.setOnStateChangedListener(playPauseButtonListener);
         actionPlayPauseButton.setOnStateChangedListener(playPauseButtonListener);
         seekbar.setNumericTransformer(new DiscreteSeekBar.NumericTransformer() {
@@ -321,10 +323,7 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
                 if(fromUser){
                     Timber.d("onProgressChanged: %d", value);
                     handler.removeMessages(MSG_SEEK);
-//                    Message msg = handler.obtainMessage(MSG_SEEK, value);
-                    Message msg = new Message();
-                    msg.arg1 = value;
-                    msg.what = MSG_SEEK;
+                    Message msg = handler.obtainMessage(MSG_SEEK, value, 0);
                     handler.sendMessageDelayed(msg, 300);
                 }
             }
@@ -335,7 +334,6 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
     @Override
     public void onDetach() {
         super.onDetach();
-
     }
 
 

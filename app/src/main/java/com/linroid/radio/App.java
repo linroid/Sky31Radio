@@ -20,18 +20,6 @@ public class App extends Application
         implements Injector {
     ObjectGraph mObjectGraph;
 
-//
-//    private void createAccount()
-//    {
-//        Account localAccount = new Account(this.person.getNickname(), "com.linroid.alwen.account");
-//        if (((AccountManager)getSystemService("account")).addAccountExplicitly(localAccount, null, null))
-//        {
-//            Timber.i("add account success", new Object[0]);
-//            return;
-//        }
-//        Timber.i("account not added", new Object[0]);
-//    }
-
     public void onCreate() {
         super.onCreate();
         Timber.Tree tree = BuildConfig.DEBUG ? new Timber.DebugTree() : new Timber.HollowTree();

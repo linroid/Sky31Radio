@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.linroid.radio.widgets.SlidingUpPanelLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.linroid.radio.widgets.SlidingUpPanelLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:sothree="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/sliding_layout"
@@ -10,7 +11,8 @@
     sothree:slidePanelOffset="0dp"
     sothree:dragView="@+id/bottom_bar"
     sothree:dragViewClickable="true"
-    sothree:shadowHeight="1dp">
+    sothree:shadowHeight="1dp"
+    android:fitsSystemWindows="true">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -33,19 +35,23 @@
                 <com.astuetz.PagerSlidingTabStrip
                     android:id="@+id/tab_strip"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="@dimen/strip_height"
                     android:background="?colorPrimary"
                     android:elevation="4dp"
                     android:textColor="#ffffff"
                     app:pstsIndicatorColor="#CDDC39"
                     app:pstsShouldExpand="true">
                 </com.astuetz.PagerSlidingTabStrip>
-
                 <android.support.v4.view.ViewPager
                     android:id="@+id/view_pager"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
+
             </LinearLayout>
+            <include layout="@layout/toolbar_shadow"
+                android:layout_marginTop="@dimen/strip_height"
+                android:layout_height="@dimen/shadow_height"
+                android:layout_width="match_parent"/>
         </FrameLayout>
     </LinearLayout>
 

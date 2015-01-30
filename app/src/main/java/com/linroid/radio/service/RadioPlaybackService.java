@@ -19,6 +19,8 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 
 import com.linroid.radio.App;
 import com.linroid.radio.IRadioService;
@@ -59,7 +61,6 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
     public static final String KEY_PROGRAM_POSITION = "program_position";
 
 
-    boolean isPlayerRelease = false;
     PlayerReceiver receiver;
     RadioPlayer player;
     NotificationManager notificationManager;
@@ -110,8 +111,9 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
         if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             // could not get audio focus.
         }
+        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+        telephonyManager.listen(mPhoneListener, PhoneStateListener.LISTEN_CALL_STATE);
     }
-
     @Override
     public boolean onUnbind(Intent intent) {
         Timber.w("onUnbind");
@@ -145,9 +147,10 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
     @Override
     public void onDestroy() {
         Timber.d("onDestroy");
+        stopForeground(true);
+        notificationManager.cancel(NOTIFICATION_ID);
         player.destroy();
         player = null;
-        isPlayerRelease = true;
         unregisterReceiver(receiver);
         wifiLock.release();
     }
@@ -297,7 +300,6 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
             Timber.d("stop");
             isPlaying = false;
             pause();
-            stopForeground(true);
             mediaPlayer = null;
             stopSelf();
         }
@@ -501,5 +503,23 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
             buildNotification();
         }
     }
+
+    PhoneStateListener mPhoneListener = new PhoneStateListener(){
+        @Override
+        public void onCallStateChanged(int state, String incomingNumber) {
+            switch (state) {
+                case TelephonyManager.CALL_STATE_IDLE:
+                    break;
+                case TelephonyManager.CALL_STATE_OFFHOOK:
+                case TelephonyManager.CALL_STATE_RINGING:
+                    if (player.isPlaying()) {
+                        player.pause();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
 }

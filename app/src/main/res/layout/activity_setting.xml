@@ -5,15 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:fitsSystemWindows="true">
     <include layout="@layout/toolbar" />
-
     <fragment
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="bottom"
         android:name="com.linroid.radio.ui.fragment.SettingsFragment"
-        tools:layout="@layout/fragment_player"
         android:id="@+id/settings" />
 
 </LinearLayout>

@@ -14,5 +14,7 @@
     <string name="hint_action_search">输入关键字</string>
     <string name="empty_article">没有节目稿</string>
     <string name="loading_article">加载节目稿中...</string>
+    <string name="pref_version_ame">versionName</string>
+    <string name="pref_build_time">buildTime</string>
 
 </resources>

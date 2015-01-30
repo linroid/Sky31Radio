@@ -116,6 +116,7 @@ public class HomeActivity extends InjectableActivity implements AlbumAdapter.OnA
     private void navigateToSearch() {
         Intent intent = new Intent(this, SearchActivity.class);
         startActivity(intent);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 
     private void onExit() {
@@ -126,7 +127,7 @@ public class HomeActivity extends InjectableActivity implements AlbumAdapter.OnA
     private void openSettingsActivity() {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
-//        overridePendingTransition(R.anim.activity_slide_in, R.anim.activity_slide_out);
+        overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_top);
     }
 
     @Override

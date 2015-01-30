@@ -34,7 +34,7 @@ public class DiskCacheManager {
                 return true;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Timber.e(e, "出错");
         }
         return false;
     }

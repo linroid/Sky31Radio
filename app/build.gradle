@@ -6,7 +6,7 @@ def versionMajor = 1
 def versionMinor = 0
 def versionPatch = 0
 def versionBuild = 0 // bump for dogfood builds, public betas, etc.
-def buildTime = new Date().format("yyyy-MM-dd'T'HH:mm'Z'", TimeZone.getTimeZone("UTC"))
+def buildTime = new Date().format("yyyy-MM-dd HH:mm", TimeZone.getTimeZone("GMT+8:00"))
 
 def buglyAppId = "900001903"
 android {
@@ -66,4 +66,21 @@ dependencies {
     compile project(':DiscreateSeekBar')
     compile 'org.michaelevans.colorart:library:0.0.2'
     compile 'com.readystatesoftware.systembartint:systembartint:1.0.4'
+}
+File propFile = file('signing.properties');
+if (propFile.exists()) {
+    def Properties props = new Properties()
+    props.load(new FileInputStream(propFile))
+
+    if (props.containsKey('STORE_FILE') && props.containsKey('STORE_PASSWORD') &&
+            props.containsKey('KEY_ALIAS') && props.containsKey('KEY_PASSWORD')) {
+        android.signingConfigs.release.storeFile = file(props['STORE_FILE'])
+        android.signingConfigs.release.storePassword = props['STORE_PASSWORD']
+        android.signingConfigs.release.keyAlias = props['KEY_ALIAS']
+        android.signingConfigs.release.keyPassword = props['KEY_PASSWORD']
+    } else {
+        android.buildTypes.release.signingConfig = null
+    }
+} else {
+    android.buildTypes.release.signingConfig = null
 }

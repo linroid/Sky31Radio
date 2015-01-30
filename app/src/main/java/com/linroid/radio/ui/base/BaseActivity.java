@@ -36,6 +36,7 @@ public abstract class BaseActivity extends ActionBarActivity {
             tintManager = new SystemBarTintManager(this);
             tintManager.setStatusBarTintEnabled(true);
             tintManager.setNavigationBarTintEnabled(true);
+            tintManager.setStatusBarTintColor(getResources().getColor(R.color.primary_dark));
         }
     }
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -47,7 +48,7 @@ public abstract class BaseActivity extends ActionBarActivity {
         }
     }
     public void setNavigationColor(int color){
-
+        tintManager.setNavigationBarTintColor(color);
     }
     protected abstract int provideContentViewId();
 
