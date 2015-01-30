@@ -64,7 +64,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="56dp"
             android:background="@color/player_background"
             android:elevation="8dp">
 
@@ -120,7 +120,7 @@
         android:layout_width="match_parent"
         android:layout_height="42dp"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="44dp">
+        android:layout_marginBottom="40dp">
         <TextView
             android:id="@+id/elapsed_duration"
             android:layout_width="wrap_content"

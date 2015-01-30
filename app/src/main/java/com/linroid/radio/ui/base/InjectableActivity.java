@@ -19,13 +19,11 @@ public abstract class InjectableActivity extends BaseActivity implements Injecto
         App app = (App) getApplication();
         objectGraph = app.plus(this);
         objectGraph.inject(this);
-        Timber.e("fuck "+ objectGraph.toString());
         super.onCreate(savedInstanceState);
     }
     public void inject(Object target){
         objectGraph.inject(target);
         Timber.i("inject to %s",  target.getClass().toString());
-
     }
 
     public ObjectGraph plus(Object[] modules){

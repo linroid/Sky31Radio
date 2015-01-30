@@ -22,3 +22,7 @@
 #Bugly接口
 -keep public class com.tencent.bugly.crashreport.crash.jni.NativeCrashHandler{public *; native <methods>;}
 -keep public interface com.tencent.bugly.crashreport.crash.jni.NativeExceptionHandler{*;}
+
+#Wechat
+-keep class com.tencent.mm.sdk.openapi.WXMediaMessage {*;}
+-keep class com.tencent.mm.sdk.openapi.** implements com.tencent.mm.sdk.openapi.WXMediaMessage$IMediaObject {*;}

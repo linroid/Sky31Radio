@@ -44,21 +44,22 @@ import timber.log.Timber;
  */
 public class RadioPlaybackService extends Service implements AudioManager.OnAudioFocusChangeListener {
     private static final int NOTIFICATION_ID = 1;
+
+    public static final String KEY_PROGRAM_LIST = "program_list";
+    public static final String KEY_PROGRAM_POSITION = "program_position";
     public static final String KEY_PROGRAM = "program";
     public static final String EXTRA_POSITION = "position";
     public static final String EXTRA_PERCENT = "percent";
-    public static final String ACTION_PLAYING_CHANGED = "com.linroid.radio.intent.action.playing_changed";
-    public static final String ACTION_PLAY = "com.linroid.radio.intent.action.play";
-    public static final String ACTION_PAUSE = "com.linroid.radio.intent.action.pause";
-    public static final String ACTION_NEXT = "com.linroid.radio.intent.action.next";
-    public static final String ACTION_PREVIOUS = "com.linroid.radio.intent.action.previous";
-    public static final String ACTION_SEEK_TO_POSITION = "com.linroid.radio.intent.action.seek_to_position";
-    public static final String ACTION_SEEK_TO_PERCENT = "com.linroid.radio.intent.action.seek_to_percent";
-    public static final String ACTION_STOP = "com.linroid.radio.intent.action.stop";
 
-    public static final String ACTION_SELECT_PROGRAM_LIST = "com.linroid.radio.intent.action.select_program_list";
-    public static final String KEY_PROGRAM_LIST = "program_list";
-    public static final String KEY_PROGRAM_POSITION = "program_position";
+    public static final String ACTION_PLAYING_CHANGED = "com.linroid.radio.intent.action.PLAYING_CHANGED";
+    public static final String ACTION_PLAY = "com.linroid.radio.intent.action.PLAY";
+    public static final String ACTION_PAUSE = "com.linroid.radio.intent.action.PAUSE";
+    public static final String ACTION_NEXT = "com.linroid.radio.intent.action.NEXT";
+    public static final String ACTION_PREVIOUS = "com.linroid.radio.intent.action.PREVIOUS";
+    public static final String ACTION_SEEK_TO_POSITION = "com.linroid.radio.intent.action.SEEK_TO_POSITION";
+    public static final String ACTION_SEEK_TO_PERCENT = "com.linroid.radio.intent.action.SEEK_TO_PERCENT";
+    public static final String ACTION_STOP = "com.linroid.radio.intent.action.STOP";
+    public static final String ACTION_SELECT_PROGRAM_LIST = "com.linroid.radio.intent.action.SELECT_PROGRAM_LIST";
 
 
     PlayerReceiver receiver;

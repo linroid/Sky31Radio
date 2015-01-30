@@ -15,7 +15,6 @@ import com.linroid.radio.ui.fragment.AnchorListFragment;
  * Created by linroid on 1/14/15.
  */
 public class HomePagerAdapter extends FragmentPagerAdapter {
-    SparseArray<Fragment> fragments = new SparseArray<>(3);
     String[] titles;
     public HomePagerAdapter(Context ctx, FragmentManager fm) {
         super(fm);
@@ -24,15 +23,6 @@ public class HomePagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        Fragment fragment;
-        fragment = fragments.get(position);
-        if(fragment == null){
-            fragment = createFragmentAtPosition(position);
-        }
-        return fragment;
-    }
-
-    private Fragment createFragmentAtPosition(int position) {
         Fragment fragment;
         switch (position){
             case 0:
@@ -45,7 +35,6 @@ public class HomePagerAdapter extends FragmentPagerAdapter {
                 fragment = ProgramListFragment.newInstance();
                 break;
         }
-        fragments.put(position, fragment);
         return fragment;
     }
 

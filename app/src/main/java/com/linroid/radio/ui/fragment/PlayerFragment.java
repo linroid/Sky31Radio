@@ -82,6 +82,9 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
     @InjectView(R.id.circularProgressBar)
     ProgressBar circularProgressBar;
 
+    @InjectView(R.id.action_share)
+    ImageButton shareBtn;
+
     @InjectView(R.id.btn_fast_rewind)
     ImageButton fastRewindButton;
     @InjectView(R.id.btn_fast_forward)
@@ -155,6 +158,10 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
             if(isPlaying){
                 long position = service.getPosition();
                 long duration = service.getDuration();
+                if(duration == 0){
+                    return;
+                }
+
                 int percent = (int) (position*100 / duration);
 
                 circularProgressBar.setProgress(percent);
@@ -179,6 +186,7 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
     }
     private void updatePlayingProgram(final Program playingProgram){
         this.program = playingProgram;
+        slidingUpPanelLayout.setSlidingEnabled(true);
         String playedCountText = getResources().getString(R.string.tpl_played_count, program.getTotalPlay());
 
         playedCountTV.setText(playedCountText);
@@ -284,7 +292,6 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
         receiver = new RadioReceiver();
         TypedValue tv = new TypedValue();
         getActivity().getTheme().resolveAttribute(R.attr.colorPrimaryDark, tv, true);
-
         homeStatusColor = tv.data;
     }
 
@@ -389,6 +396,11 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
         RadioUtils.previous(getActivity());
     }
 
+    @OnClick(R.id.action_share)
+    public void onShareProgram(View view){
+        ShareFragment.shareProgram(program)
+                .show(getFragmentManager(), "share");
+    }
     @Override
     public void onServiceDisconnected(ComponentName name) {
         this.service = null;
@@ -414,26 +426,34 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
         }
     }
     SlidingUpPanelLayout.PanelSlideListener mSlidingListener = new SlidingUpPanelLayout.SimplePanelSlideListener() {
-        float previousOffset = 1.f;
         @Override
         public void onPanelSlide(View panel, float slideOffset) {
-            if(previousOffset>slideOffset){
+            if(slideOffset <= 0.5f){
                 playPauseProgressButton.setVisibility(View.VISIBLE);
+                shareBtn.setVisibility(View.INVISIBLE);
+                playPauseProgressButton.setScaleX(1-slideOffset*2);
+                playPauseProgressButton.setScaleY(1-slideOffset*2);
+            }else{
+                playPauseProgressButton.setVisibility(View.INVISIBLE);
+                shareBtn.setVisibility(View.VISIBLE);
+                shareBtn.setScaleX(slideOffset*2-1);
+                shareBtn.setScaleY(slideOffset*2-1);
             }
-            previousOffset = slideOffset;
-            playPauseProgressButton.setScaleX(1-slideOffset);
-            playPauseProgressButton.setScaleY(1-slideOffset);
+
         }
 
         @Override
         public void onPanelCollapsed(View panel) {
             playPauseProgressButton.setVisibility(View.VISIBLE);
+            shareBtn.setVisibility(View.INVISIBLE);
             setStatusColor(homeStatusColor);
+
         }
 
         @Override
         public void onPanelExpanded(View panel) {
-            playPauseProgressButton.setVisibility(View.GONE);
+            playPauseProgressButton.setVisibility(View.INVISIBLE);
+            shareBtn.setVisibility(View.VISIBLE);
             setStatusColor(statusColor);
         }
     };

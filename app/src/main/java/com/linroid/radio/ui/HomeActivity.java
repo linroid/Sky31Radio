@@ -50,6 +50,7 @@ public class HomeActivity extends InjectableActivity implements AlbumAdapter.OnA
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        slidingUpPanelLayout.setSlidingEnabled(false);
         setUpPager();
         int currentItem = DEFAULT_PAGER_CURRENT_ITEM;
         if(savedInstanceState!=null){

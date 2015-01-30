@@ -8,6 +8,7 @@ import com.linroid.radio.ui.fragment.AlbumListFragment;
 import com.linroid.radio.ui.fragment.AnchorListFragment;
 import com.linroid.radio.ui.fragment.PlayerFragment;
 import com.linroid.radio.ui.fragment.ProgramListFragment;
+import com.linroid.radio.ui.fragment.ShareFragment;
 
 import dagger.Module;
 
@@ -18,7 +19,8 @@ import dagger.Module;
                 ProgramListFragment.class,
                 PlayerFragment.class,
                 AlbumListFragment.class,
-                AnchorListFragment.class
+                AnchorListFragment.class,
+                ShareFragment.class
         }
 )
 public class HomeModule {
