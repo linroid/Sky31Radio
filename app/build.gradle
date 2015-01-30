@@ -1,5 +1,14 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.tmiyamon.mdicons'
+
+// Manifest version information!
+def versionMajor = 1
+def versionMinor = 0
+def versionPatch = 0
+def versionBuild = 0 // bump for dogfood builds, public betas, etc.
+def buildTime = new Date().format("yyyy-MM-dd'T'HH:mm'Z'", TimeZone.getTimeZone("UTC"))
+
+def buglyAppId = "900001903"
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
@@ -8,16 +17,23 @@ android {
         applicationId "com.linroid.radio"
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 1
-        versionName "1.0"
+        versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
 
         renderscriptTargetApi 21
         renderscriptSupportModeEnabled false
+
+        buildConfigField "String", "BUGLY_APP_ID", "\"${buglyAppId}\""
+        buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            applicationIdSuffix '.dev'
+            versionNameSuffix '-dev'
         }
     }
     packagingOptions {

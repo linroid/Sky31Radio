@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.linroid.radio.module.AppModule;
 import com.linroid.radio.module.Injector;
+import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,14 +34,9 @@ public class App extends Application
 
     public void onCreate() {
         super.onCreate();
-        if (BuildConfig.DEBUG) {
-            Timber.DebugTree tree = new Timber.DebugTree();
-            Timber.plant(tree);
-        } else {
-            this.mObjectGraph = ObjectGraph.create(getModules().toArray());
-            Timber.HollowTree tree = new Timber.HollowTree();
-            Timber.plant(tree);
-        }
+        Timber.Tree tree = BuildConfig.DEBUG ? new Timber.DebugTree() : new Timber.HollowTree();
+        Timber.plant(tree);
+        CrashReport.initCrashReport(this, BuildConfig.BUGLY_APP_ID, BuildConfig.DEBUG);
         mObjectGraph = ObjectGraph.create(getModules().toArray());
         inject(this);
 

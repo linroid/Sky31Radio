@@ -13,5 +13,6 @@
     <string name="action_search">搜索节目</string>
     <string name="hint_action_search">输入关键字</string>
     <string name="empty_article">没有节目稿</string>
+    <string name="loading_article">加载节目稿中...</string>
 
 </resources>

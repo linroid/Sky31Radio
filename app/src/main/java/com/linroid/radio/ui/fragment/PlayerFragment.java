@@ -184,6 +184,7 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
         playedCountTV.setText(playedCountText);
         playerAuthorTV.setText(program.getAuthor());
         playerProgramNameTV.setText(program.getTitle());
+        articleTV.setText(R.string.loading_article);
         picasso.load(program.getThumbnail()).into(playerThumbnailIV);
         picasso.load(program.getThumbnail()).into(centerThumbnailIV);
         picasso.load(program.getThumbnail())
@@ -192,7 +193,7 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                         Timber.d("onBitmapLoaded:%s(%s)", from.name(), bitmap.toString());
                         ColorArt colorArt = new ColorArt(bitmap);
-                        articleTV.setTextColor(colorArt.getDetailColor());
+//                        articleTV.setTextColor(colorArt.getDetailColor());
                         statusColor = colorArt.getBackgroundColor();
                         visualizerView.setWaveColor(colorArt.getDetailColor());
                         if(slidingUpPanelLayout.isPanelExpanded()){
