@@ -3,9 +3,11 @@
 buildscript {
     repositories {
 //        maven { url 'http://maven.oschina.net/content/groups/public/' }
+        flatDir { dirs 'proguard' }
         jcenter();
     }
     dependencies {
+        classpath 'proguard.io:proguard:4.11'
         classpath 'com.android.tools.build:gradle:1.0.0'
         classpath 'com.tmiyamon:gradle-mdicons:0.1.0'
         // NOTE: Do not place your application dependencies here; they belong

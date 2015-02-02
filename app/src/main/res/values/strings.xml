@@ -19,5 +19,6 @@
     <string name="tpl_share_program" formatted="false">我在 %s 听到一个不错的节目\"%s\"
 你也来听听吧:%s</string>
     <string name="tpl_wx_share_description" formatted="false">我正在%s聆听%s的声音</string>
+    <string name="pref_feedback">feedback</string>
 
 </resources>

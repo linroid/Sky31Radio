@@ -349,6 +349,7 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
 
         public void seekToPosition(int position) {
             mediaPlayer.seekTo(position);
+            sendPlayingStatusChangedBroadcast(isPlaying());
         }
 
         public void destroy() {
@@ -395,9 +396,7 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
         @Override
         public void onCompletion(MediaPlayer mp) {
             Timber.i("onCompletion, %d/%d", mp.getCurrentPosition(), mp.getDuration());
-            if(mp.getCurrentPosition() == mp.getDuration()){
-                player.next();
-            }
+            player.next();
         }
 
     }

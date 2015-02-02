@@ -30,6 +30,8 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
+        <meta-data android:name="Channel ID" android:value="${LEANCLOUD_CHANNEL_ID}"/>
+
         <activity
             android:name=".ui.HomeActivity"
             android:label="@string/app_name"

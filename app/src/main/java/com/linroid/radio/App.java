@@ -2,9 +2,13 @@ package com.linroid.radio;
 
 import android.app.Application;
 
+import com.avos.avoscloud.AVAnalytics;
+import com.avos.avoscloud.AVInstallation;
+import com.avos.avoscloud.AVOSCloud;
+import com.avos.avoscloud.PushService;
 import com.linroid.radio.module.AppModule;
 import com.linroid.radio.module.Injector;
-import com.tencent.bugly.crashreport.CrashReport;
+import com.linroid.radio.ui.HomeActivity;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,10 +28,16 @@ public class App extends Application
         super.onCreate();
         Timber.Tree tree = BuildConfig.DEBUG ? new Timber.DebugTree() : new Timber.HollowTree();
         Timber.plant(tree);
-        CrashReport.initCrashReport(this, BuildConfig.BUGLY_APP_ID, BuildConfig.DEBUG);
         mObjectGraph = ObjectGraph.create(getModules().toArray());
         inject(this);
+        initLeancloud();
+    }
 
+    private void initLeancloud() {
+        AVOSCloud.initialize(this, BuildConfig.LEANCLOUD_APP_ID,BuildConfig.LEANCLOUD_APP_KEY);
+        AVInstallation.getCurrentInstallation().saveInBackground();
+        PushService.setDefaultPushCallback(this, HomeActivity.class);
+        AVAnalytics.enableCrashReport(this, true);
     }
 
     public List<Object> getModules() {

@@ -1,6 +1,11 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.tmiyamon.mdicons'
 
+def releaseTime() {
+    return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
+}
+
+
 // Manifest version information!
 def versionMajor = 1
 def versionMinor = 0
@@ -10,6 +15,9 @@ def buildTime = new Date().format("yyyy-MM-dd HH:mm", TimeZone.getTimeZone("GMT+
 
 def buglyAppId = "900001903"
 def wechatAppId = "wx0a74babb5d25de74"
+def leancloudAppId = "tppfzdpnnb99brtkh71phf5mkyba5t5wv8kw2n6tmy9wu45v"
+def leancloudAppKey = "f8s6xeebxw1qbqupgh8rjtuqb2nk1xfighsnwfl0zi71hcul"
+
 def appDownloadUrl = "http://radio.sky31.com"
 android {
     compileSdkVersion 21
@@ -22,28 +30,78 @@ android {
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
 
+        // dex突破65535的限制
+        multiDexEnabled true
+        manifestPlaceholders = [LEANCLOUD_CHANNEL_ID: "default"]
+
         renderscriptTargetApi 21
         renderscriptSupportModeEnabled true
 
         buildConfigField "String", "BUGLY_APP_ID", "\"${buglyAppId}\""
         buildConfigField "String", "WECHAT_APP_ID", "\"${wechatAppId}\""
+        buildConfigField "String", "LEANCLOUD_APP_ID", "\"${leancloudAppId}\""
+        buildConfigField "String", "LEANCLOUD_APP_KEY", "\"${leancloudAppKey}\""
 
         buildConfigField "String", "APP_DOWNLOAD_URL", "\"${appDownloadUrl}\""
         buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
     }
+    signingConfigs {
+        debug {
+            // No debug config
+        }
+
+        release {
+        }
+    }
     buildTypes {
         release {
+            shrinkResources false
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            zipAlignEnabled false
+
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    def outputFile = output.outputFile
+                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                        def fileName = "sky31_radio_v${defaultConfig.versionName}_${releaseTime()}_${variant.productFlavors[0].name}.apk"
+                        output.outputFile = new File(outputFile.parent, fileName)
+                    }
+                }
+            }
+            signingConfig signingConfigs.release
         }
         debug {
             applicationIdSuffix '.dev'
             versionNameSuffix '-dev'
+
+            shrinkResources false
+            minifyEnabled false
+            zipAlignEnabled false
+
+            signingConfig signingConfigs.debug
         }
+    }
+    productFlavors {
+        play{}
+        xiaomi {}
+        _360 {}
+        baidu {}
+        wandoujia {}
+    }
+
+    productFlavors.all {
+        flavor -> flavor.manifestPlaceholders = [LEANCLOUD_CHANNEL_ID: name]
     }
     packagingOptions {
         exclude 'META-INF/services/javax.annotation.processing.Processor'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
     }
+
+    lintOptions {
+        abortOnError false
+    }
+
 }
 //configurations {
 //    all*.exclude group: 'com.android.support', module: 'support-v13'
@@ -71,7 +129,7 @@ dependencies {
     compile project(':DiscreateSeekBar')
     compile 'org.michaelevans.colorart:library:0.0.2'
     compile 'com.readystatesoftware.systembartint:systembartint:1.0.4'
-//    compile project(':visualizer')
+    compile project(':leancloud')
 }
 File propFile = file('signing.properties');
 if (propFile.exists()) {
