@@ -81,6 +81,15 @@ public class EqualizerView extends View{
         visualizer.setDataCaptureListener(dataCaptureListener, Visualizer.getMaxCaptureRate() / 2, true, true);
         visualizer.setEnabled(true);
     }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        if(visualizer!=null){
+            visualizer.setEnabled(enabled);
+        }
+    }
+
     public void release(){
         if(visualizer != null){
             visualizer.setEnabled(false);

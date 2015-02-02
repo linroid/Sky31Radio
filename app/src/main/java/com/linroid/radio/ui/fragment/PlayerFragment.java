@@ -148,6 +148,7 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
                 case MSG_SEEK:
                     Timber.i("msg_seek, position:%d", msg.arg1);
                     RadioUtils.seekToPosition(seekBar.getContext(), msg.arg1);
+                    handler.removeMessages(MSG_UPDATE);
                     break;
             }
         }
@@ -205,6 +206,11 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
                         if (slidingUpPanelLayout.isPanelExpanded()) {
                             setStatusColor(statusColor);
                         }
+
+                        int primaryColor = colorArt.getPrimaryColor();
+                        seekBar.setThumbColor(primaryColor, colorArt.getSecondaryColor());
+                        seekBar.setScrubberColor(primaryColor);
+                        seekBar.refreshDrawableState();
                     }
 
                     @Override
@@ -306,6 +312,7 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
 
     private void nextUpdate() {
         try {
+            handler.removeMessages(MSG_UPDATE);
             long position = service.getPosition();
             long delay = 1000 - position%1000;
             handler.sendEmptyMessageDelayed(MSG_UPDATE, delay);
@@ -493,7 +500,7 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
             playPauseProgressButton.setVisibility(View.VISIBLE);
             shareBtn.setVisibility(View.INVISIBLE);
             setStatusColor(homeStatusColor);
-
+            equalizerView.setEnabled(false);
         }
 
         @Override
@@ -501,6 +508,7 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
             playPauseProgressButton.setVisibility(View.INVISIBLE);
             shareBtn.setVisibility(View.VISIBLE);
             setStatusColor(statusColor);
+            equalizerView.setEnabled(true);
         }
     };
 

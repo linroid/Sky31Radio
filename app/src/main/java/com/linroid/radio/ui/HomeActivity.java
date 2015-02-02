@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 
 import com.astuetz.PagerSlidingTabStrip;
+import com.avos.avoscloud.feedback.FeedbackAgent;
 import com.linroid.radio.R;
 import com.linroid.radio.model.Album;
 import com.linroid.radio.model.Anchor;
@@ -63,6 +64,10 @@ public class HomeActivity extends InjectableActivity implements AlbumAdapter.OnA
         titleSwitcher = new TitleSwitcher(this);
         titleSwitcher.setToolbar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+
+        FeedbackAgent agent = new FeedbackAgent(this);
+        agent.sync();
     }
 
     @Override

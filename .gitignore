@@ -5,3 +5,6 @@
 .DS_Store
 /build
 signing.properties
+*.log
+*.apk
+proguard

@@ -1,11 +1,7 @@
 package com.linroid.radio.ui.base;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import timber.log.Timber;
 
@@ -19,7 +15,15 @@ public class BaseFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Timber.i("onCreate");
     }
-
+//    public void onPause() {
+//        super.onPause();
+//        AVAnalytics.onFragmentEnd("my-list-fragment");
+//    }
+//
+//    public void onResume() {
+//        super.onResume();
+//        AVAnalytics.onFragmentStart("my-list-fragment");
+//    }
 
     public void setStatusColor(int color){
         ((BaseActivity) getActivity()).setStatusColor(color);

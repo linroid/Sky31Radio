@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.avos.avoscloud.AVAnalytics;
 import com.linroid.radio.R;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
@@ -27,6 +28,7 @@ public abstract class BaseActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Timber.i("onCreate");
+        AVAnalytics.trackAppOpened(getIntent());
         setContentView(provideContentViewId());
         ButterKnife.inject(this);
         if(toolbar!=null){
@@ -77,6 +79,13 @@ public abstract class BaseActivity extends ActionBarActivity {
     public void onPause() {
         super.onPause();
         Timber.i("onPause");
+        AVAnalytics.onPause(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AVAnalytics.onResume(this);
     }
 
     @Override

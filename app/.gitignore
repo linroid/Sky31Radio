@@ -1,1 +1,4 @@
 /build
+signing.properties
+manifest*.txt
+*.apk

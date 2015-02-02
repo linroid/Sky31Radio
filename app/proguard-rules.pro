@@ -19,6 +19,20 @@
 -keep class * extends android.app.Activity{*;}
 -keep class * extends android.app.Service{*;}
 
+
+-keepclassmembers class ** {
+    @com.squareup.otto.Subscribe public *;
+    @com.squareup.otto.Produce public *;
+}
+
+-keep class com.google.** { *; }
+-keep class com.google.gson.** { *; }
+-keep class com.google.inject.** { *; }
+-keep class org.apache.http.** { *; }
+-keep class org.apache.james.mime4j.** { *; }
+-keep class javax.inject.** { *; }
+-keep class retrofit.** { *; }
+
 #Bugly接口
 -keep public class com.tencent.bugly.crashreport.crash.jni.NativeCrashHandler{public *; native <methods>;}
 -keep public interface com.tencent.bugly.crashreport.crash.jni.NativeExceptionHandler{*;}
@@ -26,3 +40,4 @@
 #Wechat
 -keep class com.tencent.mm.sdk.openapi.WXMediaMessage {*;}
 -keep class com.tencent.mm.sdk.openapi.** implements com.tencent.mm.sdk.openapi.WXMediaMessage$IMediaObject {*;}
+-keep class com.tencent.** {*;}

@@ -1,1 +1,1 @@
-include ':app', ':DiscreateSeekBar'
+include ':app', ':DiscreateSeekBar', ':leancloud'
