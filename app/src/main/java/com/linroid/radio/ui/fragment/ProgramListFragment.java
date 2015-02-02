@@ -19,7 +19,7 @@ import com.linroid.radio.model.Pagination;
 import com.linroid.radio.model.Program;
 import com.linroid.radio.ui.adapter.ProgramAdapter;
 import com.linroid.radio.ui.base.InjectableFragment;
-import com.linroid.radio.widgets.DividerItemDecoration;
+import com.linroid.radio.view.DividerItemDecoration;
 import com.squareup.picasso.Picasso;
 
 import java.lang.reflect.Type;

@@ -19,8 +19,8 @@ import com.linroid.radio.ui.adapter.HomePagerAdapter;
 import com.linroid.radio.ui.base.InjectableActivity;
 import com.linroid.radio.ui.fragment.ProgramListFragment;
 import com.linroid.radio.utils.RadioUtils;
-import com.linroid.radio.widgets.SlidingUpPanelLayout;
-import com.linroid.radio.widgets.TitleSwitcher;
+import com.linroid.radio.view.SlidingUpPanelLayout;
+import com.linroid.radio.view.TitleSwitcher;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +32,8 @@ import timber.log.Timber;
  * Created by linroid on 1/14/15.
  */
 public class HomeActivity extends InjectableActivity implements AlbumAdapter.OnAlbumSelectedListener, AnchorAdapter.OnAnchorSelectedListener{
+    public static final String TAG_ANCHOR = "anchor";
+    public static final String TAG_ALBUM = "album";
     public static final String STATE_PAGER_CURRENT_ITEM = "pager_current_item";
     public static final int DEFAULT_PAGER_CURRENT_ITEM = 2;
     @InjectView(R.id.tab_strip)
@@ -47,6 +49,7 @@ public class HomeActivity extends InjectableActivity implements AlbumAdapter.OnA
 
     TitleSwitcher titleSwitcher;
     boolean detail = false;
+//    int layer = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,19 +131,28 @@ public class HomeActivity extends InjectableActivity implements AlbumAdapter.OnA
     private void openSettingsActivity() {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
-        overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_top);
+//        overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_top);
     }
 
     @Override
     public void onAlbumSelected(Album album) {
         Timber.d("onAlbumSelected: %s", album.getName());
+        if(detail){
+            super.onBackPressed();
+        }
         detail = true;
         ViewCompat.setElevation(homeContainer, 0);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         titleSwitcher.switchForward(album.getName());
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.home_container, ProgramListFragment.newInstance(album), "album")
+
+//        Fragment fragment = getSupportFragmentManager().findFragmentByTag(TAG_ALBUM);
+//        if(fragment!=null){
+//            getSupportFragmentManager().beginTransaction()
+//                    .remove(fragment)
+//                    .commit();
+//        }
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.home_container, ProgramListFragment.newInstance(album), TAG_ALBUM)
                 .addToBackStack(album.getName())
                 .setCustomAnimations(android.R.anim.fade_out, android.R.anim.fade_out)
                 .commit();
@@ -149,13 +161,23 @@ public class HomeActivity extends InjectableActivity implements AlbumAdapter.OnA
     @Override
     public void onAnchorSelected(Anchor anchor) {
         Timber.d("onAnchorSelected: %s", anchor.getNickname());
+        if(detail){
+            super.onBackPressed();
+        }
         detail = true;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ViewCompat.setElevation(homeContainer, 0);
         titleSwitcher.switchForward(anchor.getNickname());
+
+//        Fragment fragment = getSupportFragmentManager().findFragmentByTag(TAG_ANCHOR);
+//        if(fragment!=null){
+//            getSupportFragmentManager().beginTransaction()
+//                    .remove(fragment)
+//                    .commit();
+//        }
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.home_container, ProgramListFragment.newInstance(anchor), "anchor")
+                .add(R.id.home_container, ProgramListFragment.newInstance(anchor), TAG_ANCHOR)
                 .addToBackStack(anchor.getNickname())
                 .setCustomAnimations(android.R.anim.fade_out, android.R.anim.fade_out)
                 .commit();

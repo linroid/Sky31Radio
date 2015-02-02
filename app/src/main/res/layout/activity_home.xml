@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.linroid.radio.widgets.SlidingUpPanelLayout
+<com.linroid.radio.view.SlidingUpPanelLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:sothree="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -61,4 +61,4 @@
         android:layout_gravity="bottom"
         android:name="com.linroid.radio.ui.fragment.PlayerFragment"
         tools:layout="@layout/fragment_player" />
-</com.linroid.radio.widgets.SlidingUpPanelLayout>
+</com.linroid.radio.view.SlidingUpPanelLayout>

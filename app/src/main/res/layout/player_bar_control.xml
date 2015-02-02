@@ -8,16 +8,19 @@
     android:elevation="4dp">
     <ImageView
         android:id="@+id/player_thumbnail"
-        android:layout_width="@dimen/player_bar_height"
-        android:layout_height="@dimen/player_bar_height"
-        android:padding="8dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:src="@drawable/ic_launcher_square"
         android:scaleType="centerCrop"
         android:layout_alignParentLeft="true"/>
     <LinearLayout
+        android:id="@+id/player_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="16dp"
         android:layout_toRightOf="@id/player_thumbnail"
         android:layout_centerVertical="true"
         android:orientation="vertical"

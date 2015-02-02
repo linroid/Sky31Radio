@@ -16,11 +16,9 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 import android.text.Html;
-import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
-import android.text.style.AbsoluteSizeSpan;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,13 +34,15 @@ import com.linroid.radio.R;
 import com.linroid.radio.data.ApiService;
 import com.linroid.radio.model.Program;
 import com.linroid.radio.service.RadioPlaybackService;
+import com.linroid.radio.ui.HomeActivity;
 import com.linroid.radio.ui.base.InjectableFragment;
 import com.linroid.radio.utils.BlurTransformation;
+import com.linroid.radio.utils.ColorUtils;
 import com.linroid.radio.utils.RadioUtils;
-import com.linroid.radio.widgets.PlayPauseButton;
-import com.linroid.radio.widgets.PlayPauseProgressButton;
-import com.linroid.radio.widgets.SlidingUpPanelLayout;
-import com.linroid.radio.widgets.VisualizerView;
+import com.linroid.radio.view.EqualizerView;
+import com.linroid.radio.view.PlayPauseButton;
+import com.linroid.radio.view.PlayPauseProgressButton;
+import com.linroid.radio.view.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -57,8 +57,9 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import rx.Observer;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import timber.log.Timber;
 
 /**
@@ -69,6 +70,8 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
     ViewGroup playerRootView;
     @InjectView(R.id.player_thumbnail)
     ImageView playerThumbnailIV;
+    @InjectView(R.id.player_info)
+    ViewGroup playerInfoView;
     @InjectView(R.id.player_program_title)
     TextView playerProgramNameTV;
     @InjectView(R.id.player_author)
@@ -77,36 +80,36 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
     PlayPauseProgressButton playPauseProgressButton;
     @InjectView(R.id.action_button_play)
     PlayPauseButton actionPlayPauseButton;
-    @InjectView(R.id.progressBarBackground)
-    ProgressBar progressBarBackground;
     @InjectView(R.id.circularProgressBar)
     ProgressBar circularProgressBar;
 
     @InjectView(R.id.action_share)
     ImageButton shareBtn;
 
-    @InjectView(R.id.btn_fast_rewind)
-    ImageButton fastRewindButton;
-    @InjectView(R.id.btn_fast_forward)
-    ImageButton fastForwardButton;
     @InjectView(R.id.btn_play_pause)
     PlayPauseButton playPauseButton;
     @InjectView(R.id.center_thumbnail)
     ImageView centerThumbnailIV;
 
     @InjectView(R.id.progress_seekbar)
-    DiscreteSeekBar seekbar;
-    @InjectView(R.id.elapsed_duration)
-    TextView elapsedDurationTV;
+    DiscreteSeekBar seekBar;
+    @InjectView(R.id.duration_time)
+    TextView durationTimeTV;
+    @InjectView(R.id.position_time)
+    TextView positionTimeTV;
     @InjectView(R.id.program_played_count)
     TextView playedCountTV;
 
-    @InjectView(R.id.article_visualizer_switcher)
+    @InjectView(R.id.article_equalizer_switcher)
     ViewSwitcher viewSwitcher;
     @InjectView(R.id.visualizer)
-    VisualizerView visualizerView;
+    EqualizerView equalizerView;
     @InjectView(R.id.article)
     TextView articleTV;
+    @InjectView(R.id.anchor_nickname)
+    TextView centerAnchorNicknameTV;
+    @InjectView(R.id.anchor_avatar)
+    ImageView anchorAvatarIV;
 
     SlidingUpPanelLayout slidingUpPanelLayout;
 
@@ -124,6 +127,7 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
 
     public static final int MSG_UPDATE = 0x1;
     private static final int MSG_SEEK = 0x2;
+    Subscription subscription;
 
     Handler handler = new Handler(){
         @Override
@@ -143,7 +147,7 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
                     break;
                 case MSG_SEEK:
                     Timber.i("msg_seek, position:%d", msg.arg1);
-                    RadioUtils.seekToPosition(seekbar.getContext(), msg.arg1);
+                    RadioUtils.seekToPosition(seekBar.getContext(), msg.arg1);
                     break;
             }
         }
@@ -162,24 +166,18 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
                     return;
                 }
 
+
                 int percent = (int) (position*100 / duration);
 
                 circularProgressBar.setProgress(percent);
-                seekbar.setMax((int) duration);
-                seekbar.setMin(0);
-                seekbar.setProgress((int) position);
+                seekBar.setMax((int) duration);
+                seekBar.setMin(0);
+                seekBar.setProgress((int) position);
 
-                String elapsedDurationText = getResources().getString(
-                        R.string.tpl_elapsed_duration,
-                        dateFormat.format(new Date(position)),
-                        dateFormat.format(new Date(duration))
-                );
-                SpannableString ss = new SpannableString(elapsedDurationText);
-                ss.setSpan(new AbsoluteSizeSpan(12, true), 0, 5, 0);
-                elapsedDurationTV.setText(ss);
+                durationTimeTV.setText(dateFormat.format(new Date(duration)));
+                positionTimeTV.setText(dateFormat.format(new Date(position)));
             }
-            actionPlayPauseButton.setPlaying(isPlaying);
-            playPauseButton.setPlaying(isPlaying);
+            showPlayingStatus(isPlaying);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -187,26 +185,24 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
     private void updatePlayingProgram(final Program playingProgram){
         this.program = playingProgram;
         slidingUpPanelLayout.setSlidingEnabled(true);
+        viewSwitcher.setDisplayedChild(0);
         String playedCountText = getResources().getString(R.string.tpl_played_count, program.getTotalPlay());
 
         playedCountTV.setText(playedCountText);
         playerAuthorTV.setText(program.getAuthor());
         playerProgramNameTV.setText(program.getTitle());
         articleTV.setText(R.string.loading_article);
-//        picasso.load(program.getThumbnail()).into(playerThumbnailIV);
-//        picasso.load(program.getThumbnail()).into(centerThumbnailIV);
         picasso.load(program.getThumbnail())
+                .error(R.drawable.ic_launcher_square)
                 .into(new Target() {
                     @Override
                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                         playerThumbnailIV.setImageBitmap(bitmap);
-                        centerThumbnailIV.setImageBitmap(bitmap);
-                        Timber.d("onBitmapLoaded:%s(%s)", from.name(), bitmap.toString());
                         ColorArt colorArt = new ColorArt(bitmap);
-//                        articleTV.setTextColor(colorArt.getDetailColor());
-                        statusColor = colorArt.getBackgroundColor();
-                        visualizerView.setWaveColor(colorArt.getDetailColor());
-                        if(slidingUpPanelLayout.isPanelExpanded()){
+                        int backgroundColor = colorArt.getBackgroundColor();
+                        statusColor = ColorUtils.transformIfTooWhite(backgroundColor);
+                        Timber.d("BackgroundColor: %s, statusColor:%s", Integer.toHexString(backgroundColor), Integer.toHexString(statusColor));
+                        if (slidingUpPanelLayout.isPanelExpanded()) {
                             setStatusColor(statusColor);
                         }
                     }
@@ -214,6 +210,7 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
                     @Override
                     public void onBitmapFailed(Drawable errorDrawable) {
                         Timber.e("onBitmapFailed");
+                        playerThumbnailIV.setImageDrawable(errorDrawable);
                     }
 
                     @Override
@@ -221,16 +218,14 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
                         Timber.e("onPrepareLoad");
                     }
                 });
-//        DisplayMetrics dm  = getResources().getDisplayMetrics();
         picasso.load(program.getCover())
                 .transform(new BlurTransformation(getActivity(), program.getCover()))
-//                .centerCrop()
-//                .resize(dm.widthPixels, dm.heightPixels)
                 .into(new Target() {
                     @Override
                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                         Timber.d("onBitmapLoaded: %s (%s)", from.name(), bitmap.toString());
                         playerRootView.setBackgroundDrawable(new BitmapDrawable(getResources(), bitmap));
+                        centerThumbnailIV.setImageBitmap(bitmap);
                     }
 
                     @Override
@@ -243,34 +238,72 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
                         Timber.e("onPrepareLoad");
                     }
                 });
-        apiService.programDetail(program.getId())
+        subscription = apiService.programDetail(program.getId())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .doOnNext(new Action1<Program>() {
+
+                    .subscribe(new Observer<Program>() {
                         @Override
-                        public void call(Program program) {
+                        public void onCompleted() {
+
+                        }
+
+                        @Override
+                        public void onError(Throwable throwable) {
+
+                        }
+
+                        @Override
+                        public void onNext(Program program) {
+                            PlayerFragment.this.program = program;
+                            if (program.getAnchor() != null) {
+                                picasso.load(program.getAnchor().getAvatar()).into(anchorAvatarIV);
+                                centerAnchorNicknameTV.setText(program.getAnchor().getNickname());
+                            }
                             if (TextUtils.isEmpty(program.getArticle())) {
                                 articleTV.setText(R.string.empty_article);
                             } else {
                                 String newPlayedCountText = getResources().getString(R.string.tpl_played_count, program.getTotalPlay());
                                 playedCountTV.setText(newPlayedCountText);
                                 Spanned article = Html.fromHtml(program.getArticle());
-//                            article.setSpan(new BackgroundColorSpan(0), 0, article.length(), 0);
                                 articleTV.setText(article);
                             }
 
                         }
-                    })
-                    .subscribe();
+                    });
     }
 
-    @OnClick(R.id.visualizer)
-    public void onVisualizerClick(){
-        viewSwitcher.showNext();
+    @OnClick({R.id.article_equalizer_switcher, R.id.article})
+    public void onSwitcherClick(){
+        if(viewSwitcher.getDisplayedChild() == 0) {
+            viewSwitcher.showNext();
+        }else{
+            viewSwitcher.showPrevious();
+        }
     }
-    @OnClick(R.id.article)
-    public void onArticleClick(){
-        viewSwitcher.showPrevious();
+    @OnClick(R.id.btn_skip_previous)
+    public void onSkipPreviousButtonClick(View view){
+        RadioUtils.next(getActivity());
     }
+    @OnClick(R.id.btn_skip_next)
+    public void onSkipNextButtonClick(View view){
+        RadioUtils.previous(getActivity());
+    }
+
+    @OnClick(R.id.action_share)
+    public void onShareProgramButtonClick(View view){
+        ShareFragment.shareProgram(program)
+                .show(getFragmentManager(), "share");
+    }
+    @OnClick(R.id.anchor_avatar)
+    public void onAnchorAvatarClick(){
+        Timber.d("onAnchorAvatarClick");
+        if(program.getAnchor()!=null){
+            slidingUpPanelLayout.collapsePanel();
+            HomeActivity activity = (HomeActivity) getActivity();
+            activity.onAnchorSelected(program.getAnchor());
+        }
+    }
+
     private void nextUpdate() {
         try {
             long position = service.getPosition();
@@ -306,10 +339,11 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_player, container, false);
         ButterKnife.inject(this, view);
+//        initVisualizer();
         articleTV.setMovementMethod(ScrollingMovementMethod.getInstance());
         playPauseButton.setOnStateChangedListener(playPauseButtonListener);
         actionPlayPauseButton.setOnStateChangedListener(playPauseButtonListener);
-        seekbar.setNumericTransformer(new DiscreteSeekBar.NumericTransformer() {
+        seekBar.setNumericTransformer(new DiscreteSeekBar.NumericTransformer() {
             @Override
             public int transform(int value) {
                 return value;
@@ -319,15 +353,16 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
             public String transformToString(int value) {
                 return dateFormat.format(value);
             }
+
             @Override
             public boolean useStringTransform() {
                 return true;
             }
         });
-        seekbar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
+        seekBar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
             @Override
             public void onProgressChanged(final DiscreteSeekBar seekBar, final int value, boolean fromUser) {
-                if(fromUser){
+                if (fromUser) {
                     Timber.d("onProgressChanged: %d", value);
                     handler.removeMessages(MSG_SEEK);
                     Message msg = handler.obtainMessage(MSG_SEEK, value, 0);
@@ -352,11 +387,13 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
     @Override
     public void onResume() {
         super.onResume();
+
         Intent serviceIntent = new Intent(getActivity(), RadioPlaybackService.class);
         getActivity().bindService(serviceIntent, this, 0);
 
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(RadioPlaybackService.ACTION_PLAYING_CHANGED);
+        intentFilter.addAction(RadioPlaybackService.ACTION_PROGRAM_CHANGED);
+        intentFilter.addAction(RadioPlaybackService.ACTION_PLAYING_STATUS_CHANGED);
         getActivity().registerReceiver(receiver, intentFilter);
     }
 
@@ -365,11 +402,17 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
         super.onPause();
         getActivity().unregisterReceiver(receiver);
         getActivity().unbindService(this);
+
+        equalizerView.release();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if(subscription!=null){
+            subscription.unsubscribe();
+        }
+        ButterKnife.reset(this);
         handler.removeMessages(MSG_UPDATE);
     }
 
@@ -378,7 +421,8 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
         this.service = IRadioService.Stub.asInterface(binder);
         Timber.w("onServiceConnected");
         try {
-            visualizerView.linkPlayer(service.getPlayerSessionId());
+
+            equalizerView.linkPlayer(service.getPlayerSessionId());
             if(service.isPlaying()){
                 updatePlayingProgram(service.getPlayingProgram());
             }
@@ -387,36 +431,34 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
         }
         nextUpdate();
     }
-    @OnClick(R.id.btn_fast_forward)
-    public void onFastForwardBottonClick(View view){
-        RadioUtils.next(getActivity());
-    }
-    @OnClick(R.id.btn_fast_rewind)
-    public void onFastRewindBottonClick(View view){
-        RadioUtils.previous(getActivity());
-    }
 
-    @OnClick(R.id.action_share)
-    public void onShareProgram(View view){
-        ShareFragment.shareProgram(program)
-                .show(getFragmentManager(), "share");
-    }
     @Override
     public void onServiceDisconnected(ComponentName name) {
+        Timber.w("onServiceDisconnected");
         this.service = null;
         handler.removeMessages(MSG_UPDATE);
-        visualizerView.release();
-        Timber.w("onServiceDisconnected");
+        equalizerView.release();
+    }
+    private void showPlayingStatus(boolean playing){
+        actionPlayPauseButton.setPlaying(playing);
+        playPauseButton.setPlaying(playing);
     }
     public class RadioReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             Timber.i("receive intent: %s", intent.toString());
             switch (intent.getAction()){
-                case RadioPlaybackService.ACTION_PLAYING_CHANGED:{
+                case RadioPlaybackService.ACTION_PROGRAM_CHANGED:{
                     Program newProgram = intent.getParcelableExtra(RadioPlaybackService.KEY_PROGRAM);
                     updatePlayingProgram(newProgram);
-                    Timber.i("ACTION_PLAYING_CHANGED");
+                    Timber.i("ACTION_PROGRAM_CHANGED");
+                    nextUpdate();
+                    break;
+                }
+                case RadioPlaybackService.ACTION_PLAYING_STATUS_CHANGED:{
+                    Timber.i("ACTION_PLAYING_STATUS_CHANGED");
+                    boolean isPlaying = intent.getBooleanExtra(RadioPlaybackService.KEY_IS_PLAYING, true);
+                    showPlayingStatus(isPlaying);
                     nextUpdate();
                     break;
                 }
@@ -428,16 +470,20 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
     SlidingUpPanelLayout.PanelSlideListener mSlidingListener = new SlidingUpPanelLayout.SimplePanelSlideListener() {
         @Override
         public void onPanelSlide(View panel, float slideOffset) {
+            playerThumbnailIV.setTranslationX(-playerThumbnailIV.getWidth()*slideOffset);
+            playerThumbnailIV.setScaleX(1f - slideOffset);
+            playerThumbnailIV.setScaleY(1f-slideOffset);
+            playerInfoView.setTranslationX(playerThumbnailIV.getTranslationX());
             if(slideOffset <= 0.5f){
                 playPauseProgressButton.setVisibility(View.VISIBLE);
                 shareBtn.setVisibility(View.INVISIBLE);
-                playPauseProgressButton.setScaleX(1-slideOffset*2);
-                playPauseProgressButton.setScaleY(1-slideOffset*2);
+                playPauseProgressButton.setScaleX(1f-slideOffset*2f);
+                playPauseProgressButton.setScaleY(1f-slideOffset*2f);
             }else{
                 playPauseProgressButton.setVisibility(View.INVISIBLE);
                 shareBtn.setVisibility(View.VISIBLE);
-                shareBtn.setScaleX(slideOffset*2-1);
-                shareBtn.setScaleY(slideOffset*2-1);
+                shareBtn.setScaleX(slideOffset*2f-1f);
+                shareBtn.setScaleY(slideOffset*2f-1f);
             }
 
         }

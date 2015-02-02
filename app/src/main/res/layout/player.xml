@@ -15,7 +15,8 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:background="#888888">
             <ImageView
                 android:id="@+id/center_thumbnail"
                 android:layout_width="match_parent"
@@ -24,26 +25,57 @@
                 android:scaleType="centerCrop" />
 
             <ViewSwitcher
-                android:id="@+id/article_visualizer_switcher"
+                android:id="@+id/article_equalizer_switcher"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:foreground="?selectableItemBackground"
                 android:inAnimation="@android:anim/fade_in"
                 android:outAnimation="@android:anim/fade_out">
-                <com.linroid.radio.widgets.VisualizerView
-                    android:id="@+id/visualizer"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:waveColor="#99bdbdbd"/>
+                    android:layout_height="match_parent">
+                    <android.support.v7.widget.CardView
+                        android:layout_width="wrap_content"
+                        android:layout_height="152dp"
+                        android:layout_gravity="center">
+                        <ImageButton
+                            android:id="@+id/anchor_avatar"
+                            android:layout_width="128dp"
+                            android:layout_height="128dp"
+                            android:scaleType="fitCenter"
+                            android:adjustViewBounds="true"
+                            android:layout_gravity="top"
+                            android:background="?buttonBackground"
+                            android:src="@drawable/ic_launcher_square"/>
+                        <TextView
+                            android:id="@+id/anchor_nickname"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/app_name"
+                            android:textStyle="bold"
+                            android:padding="4dp"
+                            android:gravity="center_horizontal"
+                            android:layout_gravity="bottom|center_horizontal"/>
+
+                    </android.support.v7.widget.CardView>
+                    <com.linroid.radio.view.EqualizerView
+                        android:id="@+id/visualizer"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        tools:visibility="gone"
+                        app:waveColor="#66FFFFFF"
+                        app:waveWidth="16dp"
+                        app:waveDividerWidth="8dp"/>
+                </FrameLayout>
                 <TextView
                     android:id="@+id/article"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="8dp"
-                    android:clickable="false"
                     android:gravity="left"
                     android:layout_gravity="center"
-                    android:textColor="#aaffffff"
-                    android:background="#88000000"
+                    android:textColor="#aa000000"
+                    android:background="#66FFFFFF"
                     tools:text="加载中..."
                     android:clipToPadding="false"/>
             </ViewSwitcher>
@@ -51,9 +83,8 @@
                 android:id="@+id/program_played_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right|bottom"
-                android:layout_marginRight="8dp"
-                android:layout_marginBottom="2dp"
+                android:layout_gravity="center_horizontal|bottom"
+                android:layout_marginBottom="4dp"
                 android:shadowColor="@android:color/black"
                 android:shadowDy="4"
                 android:shadowRadius="4"
@@ -82,7 +113,7 @@
                 <!--android:textColor="@android:color/white"-->
                 <!--android:textStyle="bold"-->
                 <!--tools:text="播放次数:1111" />-->
-            <com.linroid.radio.widgets.PlayPauseButton
+            <com.linroid.radio.view.PlayPauseButton
                 android:id="@+id/btn_play_pause"
                 style="?android:borderlessButtonStyle"
                 android:layout_width="wrap_content"
@@ -90,11 +121,11 @@
                 android:minWidth="96dp"
                 android:layout_centerInParent="true"
                 android:background="?buttonBackground"
-                app:pauseSrc="@drawable/ic_play_arrow_white_48dp"
-                app:playSrc="@drawable/ic_pause_white_48dp" />
+                app:pauseSrc="@drawable/ic_action_play_circle_outline"
+                app:playSrc="@drawable/ic_action_pause_circle_outline" />
 
             <ImageButton
-                android:id="@+id/btn_fast_forward"
+                android:id="@+id/btn_skip_previous"
                 style="?android:borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -102,10 +133,10 @@
                 android:layout_centerInParent="true"
                 android:layout_toRightOf="@id/btn_play_pause"
                 android:background="?buttonBackground"
-                android:src="@drawable/ic_fast_forward_white_48dp" />
+                android:src="@drawable/ic_action_skip_next" />
 
             <ImageButton
-                android:id="@+id/btn_fast_rewind"
+                android:id="@+id/btn_skip_next"
                 style="?android:borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -113,7 +144,7 @@
                 android:layout_centerInParent="true"
                 android:layout_toLeftOf="@id/btn_play_pause"
                 android:background="?buttonBackground"
-                android:src="@drawable/ic_fast_rewind_white_48dp" />
+                android:src="@drawable/ic_action_skip_previous" />
         </RelativeLayout>
     </LinearLayout>
     <RelativeLayout
@@ -122,7 +153,7 @@
         android:layout_gravity="bottom"
         android:layout_marginBottom="40dp">
         <TextView
-            android:id="@+id/elapsed_duration"
+            android:id="@+id/duration_time"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
@@ -131,17 +162,28 @@
             android:layout_marginRight="8dp"
             android:textColor="#ffffff"
             android:textSize="10sp"
-
             android:shadowDy="4"
             android:shadowRadius="4"
-            android:text="00:00 / --:--"/>
-
+            android:text="--:--"/>
+        <TextView
+            android:id="@+id/position_time"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="8dp"
+            android:gravity="bottom"
+            android:layout_marginLeft="8dp"
+            android:textColor="#ffffff"
+            android:textSize="10sp"
+            android:shadowDy="4"
+            android:shadowRadius="4"
+            android:text="00:00"/>
         <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
             android:id="@+id/progress_seekbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="-16dp"
-            android:layout_marginRight="-16dp"
+            android:layout_marginLeft="-18dp"
+            android:layout_marginRight="-18dp"
             android:layout_alignParentBottom="true"
             seekbar:dsb_max="100"
             seekbar:dsb_min="0"

@@ -36,7 +36,9 @@
         <attr name="pauseSrc" format="reference"/>
     </declare-styleable>
 
-    <declare-styleable name="VisualizerView">
+    <declare-styleable name="EqualizerView">
         <attr name="waveColor" format="color|reference"/>
+        <attr name="waveDividerWidth" format="dimension|reference"/>
+        <attr name="waveWidth" format="dimension|reference"/>
     </declare-styleable>
 </resources>

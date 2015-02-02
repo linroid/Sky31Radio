@@ -2,7 +2,7 @@
 package com.linroid.radio;
 import com.linroid.radio.model.Program;
 interface IRadioService {
-    void start();
+    void play();
     void pause();
     void stop();
     void seekToPercent(int percent);

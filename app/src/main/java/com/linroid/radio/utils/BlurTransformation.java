@@ -2,11 +2,10 @@ package com.linroid.radio.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.Build;
-import android.renderscript.Allocation;
-import android.renderscript.Element;
-import android.renderscript.RenderScript;
-import android.renderscript.ScriptIntrinsicBlur;
+import android.support.v8.renderscript.Element;
+import android.support.v8.renderscript.RenderScript;
+import android.support.v8.renderscript.ScriptIntrinsicBlur;
+import android.support.v8.renderscript.Allocation;
 
 import com.squareup.picasso.Transformation;
 
@@ -28,9 +27,9 @@ public class BlurTransformation implements Transformation {
     public Bitmap transform(Bitmap source) {
         Timber.i("start bitmap transform");
         try {
-            float radius = 20f;
+            float radius = 10f;
             Bitmap outputBitmap;
-            if(Build.VERSION.SDK_INT >= 17){
+//            if(Build.VERSION.SDK_INT >= 17){
                 outputBitmap = Bitmap.createBitmap(source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);
                 RenderScript rs = RenderScript.create(ctx);
                 ScriptIntrinsicBlur sib = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
@@ -41,9 +40,9 @@ public class BlurTransformation implements Transformation {
                 sib.forEach(tmpOut);
                 tmpOut.copyTo(outputBitmap);
                 source.recycle();
-            }else{
-                outputBitmap = FastBlur.doBlur(source, (int) radius, true);
-            }
+//            }else{
+//                outputBitmap = FastBlur.doBlur(source, (int) radius, true);
+//            }
             Timber.d("blur bitmap success");
             return outputBitmap;
         } catch (Exception e) {

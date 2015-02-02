@@ -58,7 +58,7 @@ public class ShareFragment extends DialogFragment implements DialogInterface.OnC
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_list_item_1,
                 android.R.id.text1,
-                new String[]{"微信好友", "朋友圈",  "其他方式"}
+                new String[]{"微信好友", "朋友圈",  "其他地方"}
         );
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.title_share_program)
@@ -99,9 +99,14 @@ public class ShareFragment extends DialogFragment implements DialogInterface.OnC
      * 分享到其他地方
      */
     private void shareOtherWay() {
-        String text = getResources().getString(R.string.tpl_share_program, sharingProgram.getTitle(), BuildConfig.APP_DOWNLOAD_URL);
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.putExtra(Intent.EXTRA_TEXT, text);
+        String text = getResources().getString(R.string.tpl_share_program,
+                                                getString(R.string.app_name),
+                                                sharingProgram.getTitle(),
+                                                BuildConfig.APP_DOWNLOAD_URL);
+        Intent targetIntent = new Intent(Intent.ACTION_SEND);
+        targetIntent.setType("text/plain");
+        targetIntent.putExtra(Intent.EXTRA_TEXT, text);
+        Intent intent = Intent.createChooser(targetIntent, getString(R.string.title_share_program));
         startActivity(intent);
     }
 
@@ -128,14 +133,16 @@ public class ShareFragment extends DialogFragment implements DialogInterface.OnC
                         iwxapi.registerApp(BuildConfig.WECHAT_APP_ID);
 
                         WXMusicObject object = new WXMusicObject();
-                        object.musicUrl = sharingProgram.getAudio().getSrc();
-                        object.musicDataUrl = BuildConfig.APP_DOWNLOAD_URL;
+                        object.musicUrl = BuildConfig.APP_DOWNLOAD_URL;
+                        object.musicDataUrl = sharingProgram.getAudio().getSrc();
                         object.musicLowBandUrl = sharingProgram.getThumbnail();
-
+                        object.musicLowBandDataUrl = sharingProgram.getThumbnail();
                         WXMediaMessage message = new WXMediaMessage();
                         message.mediaObject = object;
                         message.title = sharingProgram.getTitle();
-                        message.description = sharingProgram.getAuthor();
+                        message.description = getString(R.string.tpl_wx_share_description,
+                                getString(R.string.app_name),
+                                sharingProgram.getAuthor());
                         message.thumbData  = thumbData;
 
                         SendMessageToWX.Req request = new SendMessageToWX.Req();

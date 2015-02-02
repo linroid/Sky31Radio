@@ -4,10 +4,8 @@
     <string name="app_name">四季电台</string>
     <string name="action_settings">软件设置</string>
     <string name="title_activity_settings">软件设置</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="tpl_program_count">%d 个节目</string>
     <string name="tpl_played_count">播放:%d</string>
-    <string name="tpl_elapsed_duration" formatted="false">%s / %s</string>
     <string name="action_exit">退出</string>
     <string name="title_activity_search">节目搜索</string>
     <string name="action_search">搜索节目</string>
@@ -18,6 +16,8 @@
     <string name="pref_version_ame">versionName</string>
     <string name="pref_build_time">buildTime</string>
     <string name="title_share_program">分享到</string>
-    <string name="tpl_share_program" formatted="false">我在 四季电台 听到一个不错的节目\"%s\",你也来听听吧:%s</string>
+    <string name="tpl_share_program" formatted="false">我在 %s 听到一个不错的节目\"%s\"
+你也来听听吧:%s</string>
+    <string name="tpl_wx_share_description" formatted="false">我正在%s聆听%s的声音</string>
 
 </resources>

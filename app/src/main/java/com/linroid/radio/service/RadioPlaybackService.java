@@ -48,10 +48,14 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
     public static final String KEY_PROGRAM_LIST = "program_list";
     public static final String KEY_PROGRAM_POSITION = "program_position";
     public static final String KEY_PROGRAM = "program";
+    public static final String KEY_IS_PLAYING = "is_playing";
+
+
     public static final String EXTRA_POSITION = "position";
     public static final String EXTRA_PERCENT = "percent";
 
-    public static final String ACTION_PLAYING_CHANGED = "com.linroid.radio.intent.action.PLAYING_CHANGED";
+    public static final String ACTION_PROGRAM_CHANGED = "com.linroid.radio.intent.action.PROGRAM_CHANGED";
+    public static final String ACTION_PLAYING_STATUS_CHANGED = "com.linroid.radio.intent.action.PLAYING_STATUS_CHANGED";
     public static final String ACTION_PLAY = "com.linroid.radio.intent.action.PLAY";
     public static final String ACTION_PAUSE = "com.linroid.radio.intent.action.PAUSE";
     public static final String ACTION_NEXT = "com.linroid.radio.intent.action.NEXT";
@@ -134,16 +138,29 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
         int playingIndex = data.getInt(KEY_PROGRAM_POSITION);
         player.setProgramList(programList, playingIndex);
         player.loadProgram();
-        player.start();
-
         return super.onStartCommand(intent, flags, startId);
     }
-    private void sendPlayingChangedBroadcast(Program program){
+    private void sendProgramChangedBroadcast(Program program){
         buildNotification();
         Intent broadCastIntent = new Intent();
-        broadCastIntent.setAction(ACTION_PLAYING_CHANGED);
+        broadCastIntent.setAction(ACTION_PROGRAM_CHANGED);
         broadCastIntent.putExtra(RadioPlaybackService.KEY_PROGRAM, program);
         sendBroadcast(broadCastIntent);
+    }
+    private void sendPlayingStatusChangedBroadcast(boolean isPlaying){
+        if(isPlaying){
+            final Intent audioEffectIntent = new Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION);
+            audioEffectIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, player.mediaPlayer.getAudioSessionId());
+            audioEffectIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, getPackageName());
+            sendBroadcast(audioEffectIntent);
+        }
+
+        buildNotification();
+
+        Intent statusChangedIntent = new Intent();
+        statusChangedIntent.setAction(ACTION_PLAYING_STATUS_CHANGED);
+        statusChangedIntent.putExtra(RadioPlaybackService.KEY_IS_PLAYING, isPlaying);
+        sendBroadcast(statusChangedIntent);
     }
     @Override
     public void onDestroy() {
@@ -160,41 +177,29 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
 //        Notification.MediaStyle style = new Notification.MediaStyle();
 //        style.setShowActionsInCompactView(0, 1, 2);
 
-        String playButtonText;
         int playButtonIconResId;
         String playButtonAction;
         if(player.isPlaying()){
             playButtonAction = ACTION_PAUSE;
-            playButtonIconResId = R.drawable.ic_pause_white_24dp;
-            playButtonText = "暂停";
+            playButtonIconResId = R.drawable.ic_stat_action_pause;
         }else{
             playButtonAction = ACTION_PLAY;
-            playButtonIconResId = R.drawable.ic_play_arrow_white_24dp;
-            playButtonText = "播放";
+            playButtonIconResId = R.drawable.ic_stat_action_play_arrow;
         }
         Intent intent = new Intent(this, HomeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 1, intent, 0);
         Program playingProgram = player.getPlayingProgram();
-        NotificationCompat.Style style = new NotificationCompat.Style(){
-            @Override
-            public Notification build() {
-                return super.build();
-            }
-        };
+
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_stat_playing)
-//                .setStyle(style)
                 .setContentTitle(playingProgram.getTitle())
                 .setContentText(playingProgram.getAuthor())
                 .setContentIntent(contentIntent)
                 .setShowWhen(true)
-                .addAction(R.drawable.ic_fast_rewind_white_24dp, "上一个", createAction(ACTION_PREVIOUS))
-                .addAction(playButtonIconResId, playButtonText, createAction(playButtonAction))
-                .addAction(R.drawable.ic_fast_forward_white_24dp, "下一个", createAction(ACTION_NEXT));
-//        Notification notification = builder.build();
-//        notificationManager.notify(NOTIFICATION_ID, notification);
-//        startForeground(NOTIFICATION_ID, notification);
+                .addAction(R.drawable.ic_stat_action_skip_previous, null, createAction(ACTION_PREVIOUS))
+                .addAction(playButtonIconResId, null, createAction(playButtonAction))
+                .addAction(R.drawable.ic_stat_action_skip_next, null, createAction(ACTION_NEXT));
         picasso.load(playingProgram.getThumbnail()).into(new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
@@ -258,13 +263,14 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
     private class RadioPlayer implements MediaPlayer.OnBufferingUpdateListener,
             MediaPlayer.OnPreparedListener,
             MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener{
-        boolean isPlaying = false;
+        private boolean isPlaying = false;
         private List<Program> programList = new ArrayList<>();
         private int playingIndex;
         MediaPlayer mediaPlayer;
         public RadioPlayer() {
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mediaPlayer.setLooping(true);
             mediaPlayer.setOnBufferingUpdateListener(this);
             mediaPlayer.setOnPreparedListener(this);
             mediaPlayer.setScreenOnWhilePlaying(true);
@@ -273,34 +279,31 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
             mediaPlayer.setWakeMode(RadioPlaybackService.this, PowerManager.PARTIAL_WAKE_LOCK);
         }
 
-        public void start() {
-            Timber.d("player start");
-            isPlaying = true;
-            buildNotification();
-            if (!mediaPlayer.isPlaying()) {
-                mediaPlayer.start();
-            }
-            final Intent intent = new Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION);
-            intent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, player.mediaPlayer.getAudioSessionId());
-            intent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, getPackageName());
-            sendBroadcast(intent);
-        }
-
         public boolean isPlaying(){
             return mediaPlayer!=null && (isPlaying||mediaPlayer.isPlaying());
         }
+        public void play() {
+            Timber.d("player play");
+            isPlaying = true;
+            if (!mediaPlayer.isPlaying()) {
+                mediaPlayer.start();
+            }
+            sendPlayingStatusChangedBroadcast(true);
+
+        }
         public void pause() {
-            Timber.d("player pause");
             isPlaying = false;
             if (mediaPlayer != null) {
                 mediaPlayer.pause();
             }
+            sendPlayingStatusChangedBroadcast(false);
+            Timber.d("player paused");
         }
 
         public void stop() {
             Timber.d("stop");
-            isPlaying = false;
             pause();
+            mediaPlayer.release();
             mediaPlayer = null;
             stopSelf();
         }
@@ -326,12 +329,10 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
                 mediaPlayer.setDataSource(url);
                 mediaPlayer.prepareAsync();
             } catch (IOException | IllegalStateException e) {
-                e.printStackTrace();
+                Timber.e(e, "load program failed");
             }
-            Timber.i("loadProgram completed");
-            sendPlayingChangedBroadcast(program);
+            sendProgramChangedBroadcast(program);
         }
-
         public void setProgramList(List<Program> programList, int playingIndex) {
             this.programList = programList;
             this.playingIndex = playingIndex;
@@ -350,33 +351,6 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
             mediaPlayer.seekTo(position);
         }
 
-        @Override
-        public void onBufferingUpdate(MediaPlayer mp, int percent) {
-            if(percent == 100){
-                Timber.d("buffer complete");
-            }
-        }
-
-        @Override
-        public void onPrepared(MediaPlayer mp) {
-            Timber.v("onPrepared");
-            mp.start();
-        }
-
-        @Override
-        public boolean onError(MediaPlayer mp, int what, int extra) {
-            Timber.e("onError");
-            return false;
-        }
-
-        @Override
-        public void onCompletion(MediaPlayer mp) {
-            Timber.i("onCompletion");
-//            if(mp.getCurrentPosition() == mp.getDuration()){
-//                next();
-//            }
-        }
-
         public void destroy() {
             isPlaying = false;
             if (mediaPlayer != null) {
@@ -386,12 +360,7 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
             }
         }
 
-        public void play() {
-            isPlaying = true;
-            if (!mediaPlayer.isPlaying()) {
-                mediaPlayer.start();
-            }
-        }
+
 
         public long getPosition() {
             return mediaPlayer.getCurrentPosition();
@@ -404,14 +373,39 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
         public int getSessionId() {
             return mediaPlayer.getAudioSessionId();
         }
-    }
-    IBinder mBinder = new IRadioService.Stub() {
-
         @Override
-        public void start() throws RemoteException {
-            player.start();
+        public void onBufferingUpdate(MediaPlayer mp, int percent) {
+            if(percent == 100){
+                Timber.d("buffer complete");
+            }
         }
 
+        @Override
+        public void onPrepared(MediaPlayer mp) {
+            Timber.v("onPrepared");
+            this.play();
+        }
+
+        @Override
+        public boolean onError(MediaPlayer mp, int what, int extra) {
+            Timber.e("onError");
+            return true;
+        }
+
+        @Override
+        public void onCompletion(MediaPlayer mp) {
+            Timber.i("onCompletion, %d/%d", mp.getCurrentPosition(), mp.getDuration());
+            if(mp.getCurrentPosition() == mp.getDuration()){
+                player.next();
+            }
+        }
+
+    }
+    IBinder mBinder = new IRadioService.Stub() {
+        @Override
+        public void play() throws RemoteException {
+            player.play();
+        }
         @Override
         public void pause() throws RemoteException {
             player.pause();
@@ -501,7 +495,6 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
                     break;
 
             }
-            buildNotification();
         }
     }
 

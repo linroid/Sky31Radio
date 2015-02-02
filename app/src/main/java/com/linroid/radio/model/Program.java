@@ -43,6 +43,7 @@ public class Program implements Parcelable {
     @Expose
     private Album album;
 
+    private Anchor anchor;
     /**
      * 
      * @return
@@ -285,6 +286,13 @@ public class Program implements Parcelable {
         this.album = album;
     }
 
+    public Anchor getAnchor() {
+        return anchor;
+    }
+
+    public void setAnchor(Anchor anchor) {
+        this.anchor = anchor;
+    }
 
     public Program() {
     }
@@ -310,6 +318,7 @@ public class Program implements Parcelable {
         dest.writeInt(this.totalPlay);
         dest.writeParcelable(this.audio, 0);
         dest.writeParcelable(this.album, 0);
+        dest.writeParcelable(this.anchor, 0);
     }
 
     private Program(Parcel in) {
@@ -327,6 +336,7 @@ public class Program implements Parcelable {
         this.totalPlay = in.readInt();
         this.audio = in.readParcelable(Audio.class.getClassLoader());
         this.album = in.readParcelable(Album.class.getClassLoader());
+        this.anchor = in.readParcelable(Anchor.class.getClassLoader());
     }
 
     public static final Creator<Program> CREATOR = new Creator<Program>() {

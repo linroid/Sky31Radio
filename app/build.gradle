@@ -23,7 +23,7 @@ android {
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
 
         renderscriptTargetApi 21
-        renderscriptSupportModeEnabled false
+        renderscriptSupportModeEnabled true
 
         buildConfigField "String", "BUGLY_APP_ID", "\"${buglyAppId}\""
         buildConfigField "String", "WECHAT_APP_ID", "\"${wechatAppId}\""
@@ -52,7 +52,7 @@ mdicons {
     pattern '((fast_forward|fast_rewind|pause|play_arrow|refresh|search)_white_24dp)|((fast_forward|fast_rewind|pause|play_arrow)_white_48dp)'
 }
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
     provided 'com.squareup.dagger:dagger-compiler:1.2.2'
     compile 'com.squareup.dagger:dagger:1.2.2'
     compile 'com.android.support:support-v4:21.0.3'
@@ -71,6 +71,7 @@ dependencies {
     compile project(':DiscreateSeekBar')
     compile 'org.michaelevans.colorart:library:0.0.2'
     compile 'com.readystatesoftware.systembartint:systembartint:1.0.4'
+//    compile project(':visualizer')
 }
 File propFile = file('signing.properties');
 if (propFile.exists()) {
