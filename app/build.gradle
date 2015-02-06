@@ -64,16 +64,16 @@ android {
             shrinkResources false
             minifyEnabled false
             zipAlignEnabled false
-//
-//            applicationVariants.all { variant ->
-//                variant.outputs.each { output ->
-//                    def outputFile = output.outputFile
-//                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
-//                        def fileName = "sky31_radio_v${defaultConfig.versionName}_${releaseTime()}_${variant.productFlavors[0].name}.apk"
-//                        output.outputFile = new File(outputFile.parent, fileName)
-//                    }
-//                }
-//            }
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    def outputFile = output.outputFile
+                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                        File outputDirectory = new File(outputFile.parent, "build/release");
+                        def fileName = "sky31_radio_v${defaultConfig.versionName}_${releaseTime()}_${variant.productFlavors[0].name}.apk"
+                        output.outputFile = new File(outputDirectory, fileName)
+                    }
+                }
+            }
             signingConfig signingConfigs.release
         }
         debug {
@@ -89,12 +89,13 @@ android {
     }
     productFlavors {
         play{}
-//        meizu{}
-//        yinyongbao{}
-//        xiaomi {}
-//        _360 {}
-//        baidu {}
-//        wandoujia {}
+        meizu{}
+        tencent{}
+        xiaomi {}
+        _360 {}
+        baidu {}
+        wandoujia {}
+        sky31{}
     }
 
     productFlavors.all {
