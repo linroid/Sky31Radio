@@ -47,7 +47,7 @@ public class AnchorAdapter extends RecyclerView.Adapter<AnchorAdapter.ViewHolder
         Anchor anchor = anchorList.get(i);
         holder.nicknameTV.setText(anchor.getNickname());
         holder.programCountTV.setText(String.format(programCountTpl, anchor.getProgramCount()));
-        picasso.load(anchor.getAvatar()).into(holder.avatarIV);
+        picasso.load(anchor.getAvatar()).placeholder(R.drawable.holde_image).into(holder.avatarIV);
     }
 
     @Override

@@ -4,14 +4,11 @@
     android:layout_height="match_parent"
     tools:context="com.linroid.radio.ui.fragment.ProgramListFragment"
     android:background="#eeeeee">
-
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@id/refresher"
+    <com.linroid.radio.view.ContentLoaderView
+        android:id="@id/content_loader"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-    </android.support.v4.widget.SwipeRefreshLayout>
+        android:layout_height="match_parent"/>
+    <include layout="@layout/toolbar_shadow"
+        android:layout_height="@dimen/shadow_height"
+        android:layout_width="match_parent"/>
 </FrameLayout>

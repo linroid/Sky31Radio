@@ -17,7 +17,7 @@ public class SearchProgramListFragment extends ProgramListFragment {
     }
     public void setKeyword(CharSequence keyword){
         conditions.put(KEY_KEYWORD, keyword.toString());
-        loadData(page);
+        loadData(1);
     }
     @Override
     public void loadData(int page) {

@@ -2,7 +2,6 @@ package com.linroid.radio.ui.fragment;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +16,7 @@ import com.linroid.radio.data.DiskCacheManager;
 import com.linroid.radio.model.Anchor;
 import com.linroid.radio.ui.adapter.AnchorAdapter;
 import com.linroid.radio.ui.base.InjectableFragment;
+import com.linroid.radio.view.ContentLoaderView;
 import com.squareup.picasso.Picasso;
 
 import java.lang.reflect.Type;
@@ -30,14 +30,13 @@ import butterknife.InjectView;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
-import rx.Subscription;
+import rx.android.app.AppObservable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
-import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
 
-public class AnchorListFragment extends InjectableFragment implements SwipeRefreshLayout.OnRefreshListener {
+public class AnchorListFragment extends InjectableFragment implements ContentLoaderView.OnRefreshListener {
 
     @Override
     public void onDetach() {
@@ -45,10 +44,11 @@ public class AnchorListFragment extends InjectableFragment implements SwipeRefre
     }
 
     public static final String KEY_USER = "key_user";
+
+    @InjectView(R.id.content_loader)
+    ContentLoaderView loaderView;
     @InjectView(R.id.recycler)
     RecyclerView recyclerView;
-    @InjectView(R.id.refresher)
-    SwipeRefreshLayout refreshLayout;
 
     @Inject
     ApiService apiService;
@@ -58,8 +58,6 @@ public class AnchorListFragment extends InjectableFragment implements SwipeRefre
     DiskCacheManager cacheManager;
 
     boolean hasLoaded = false;
-    Subscription subscription;
-    PublishSubject<List<Anchor>> anchorRequest;
     AnchorAdapter adapter;
     AnchorAdapter.OnAnchorSelectedListener listener;
 
@@ -82,8 +80,9 @@ public class AnchorListFragment extends InjectableFragment implements SwipeRefre
         if(savedInstanceState!=null){
             List<Anchor> anchorList = savedInstanceState.getParcelableArrayList(KEY_USER);
             adapter.setListData(anchorList);
+        }else{
+            loadData();
         }
-        loadData();
     }
 
     @Override
@@ -101,17 +100,16 @@ public class AnchorListFragment extends InjectableFragment implements SwipeRefre
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
-        recyclerView.setAdapter(adapter);
-        refreshLayout.setColorSchemeResources(
-                android.R.color.holo_blue_light,
-                android.R.color.holo_purple,
-                android.R.color.holo_green_light,
-                android.R.color.holo_red_light,
-                android.R.color.holo_orange_light
-        );
-        refreshLayout.setOnRefreshListener(this);
+
+        loaderView.setAdapter(adapter);
+        loaderView.setOnRefreshListener(this);
 
         return  view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
     }
 
     @Override
@@ -126,40 +124,30 @@ public class AnchorListFragment extends InjectableFragment implements SwipeRefre
         if(activity instanceof AnchorAdapter.OnAnchorSelectedListener){
             listener = (AnchorAdapter.OnAnchorSelectedListener) activity;
         }else{
-            throw new IllegalArgumentException(" activity must implement AnchorAdapter.OnAnchorSelectedListener");
+            throw new IllegalArgumentException("activity must implement AnchorAdapter.OnAnchorSelectedListener");
         }
     }
 
-    @Override
-    public void onRefresh() {
-        Timber.i("onRefresh");
-        loadData();
-    }
     public void loadData(){
-        if(refreshLayout!=null && !refreshLayout.isRefreshing()){
-            refreshLayout.setRefreshing(true);
-        }
-        if(anchorRequest==null || subscription.isUnsubscribed()){
-            anchorRequest = PublishSubject.create();
-            subscription = anchorRequest.subscribe(observer);
-        }
         if(!hasLoaded){
-            Observable.create(new Observable.OnSubscribe<List<Anchor>>() {
-                @Override
-                public void call(Subscriber<? super List<Anchor>> subscriber) {
-                    if (cacheManager.exits(DiskCacheManager.KEY_ANCHOR)) {
-                        Type type = new TypeToken<List<Anchor>>() { }.getType();
-                        List<Anchor> cachedData = cacheManager.get(DiskCacheManager.KEY_ANCHOR, type);
-                        Timber.d("load data from cached file successful!");
-                        if(cachedData!=null && cachedData.size()>0) {
-                            subscriber.onNext(cachedData);
+            AppObservable.bindFragment(this,
+                    Observable.create(new Observable.OnSubscribe<List<Anchor>>() {
+                    @Override
+                    public void call(Subscriber<? super List<Anchor>> subscriber) {
+                        if (cacheManager.exits(DiskCacheManager.KEY_ANCHOR)) {
+                            Type type = new TypeToken<List<Anchor>>() { }.getType();
+                            List<Anchor> cachedData = cacheManager.get(DiskCacheManager.KEY_ANCHOR, type);
+                            Timber.d("load data from cached file successful!");
+                            if(cachedData!=null && cachedData.size()>0) {
+                                subscriber.onNext(cachedData);
+                            }
                         }
                     }
-                    subscriber.onCompleted();
-                }
-            }).subscribe(anchorRequest);
+                })
+            )
+            .subscribe(observer);
         }
-        apiService.listAnchor()
+        AppObservable.bindFragment(this, apiService.listAnchor())
                 .map(new Func1<List<Anchor>, List<Anchor>>() {
                     @Override
                     public List<Anchor> call(List<Anchor> anchors) {
@@ -168,20 +156,18 @@ public class AnchorListFragment extends InjectableFragment implements SwipeRefre
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(anchorRequest);
+                .subscribe(observer);
     }
     Observer<List<Anchor>> observer = new Observer<List<Anchor>>() {
         @Override
         public void onCompleted() {
-            if(refreshLayout!=null && !refreshLayout.isRefreshing()){
-                refreshLayout.setRefreshing(false);
-            }
+            Timber.i("listAnchor onCompleted");
         }
 
         @Override
         public void onError(Throwable throwable) {
-            onCompleted();
             Timber.e(throwable, "发生错误: %s", throwable.getMessage());
+            loaderView.notifyLoadFailed(throwable);
         }
 
         @Override
@@ -192,4 +178,9 @@ public class AnchorListFragment extends InjectableFragment implements SwipeRefre
             adapter.notifyDataSetChanged();
         }
     };
+
+    @Override
+    public void onRefresh(boolean fromSwipe) {
+        loadData();
+    }
 }

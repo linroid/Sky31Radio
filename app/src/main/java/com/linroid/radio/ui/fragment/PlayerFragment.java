@@ -428,8 +428,8 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
         this.service = IRadioService.Stub.asInterface(binder);
         Timber.w("onServiceConnected");
         try {
-
             equalizerView.linkPlayer(service.getPlayerSessionId());
+            equalizerView.setEnabled(slidingUpPanelLayout.isPanelExpanded());
             if(service.isPlaying()){
                 updatePlayingProgram(service.getPlayingProgram());
             }

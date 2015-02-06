@@ -41,4 +41,17 @@
         <attr name="waveDividerWidth" format="dimension|reference"/>
         <attr name="waveWidth" format="dimension|reference"/>
     </declare-styleable>
+    <declare-styleable name="ContentLoaderView">
+        <attr name="loadingView" format="integer|reference"/>
+        <attr name="errorView" format="integer|reference"/>
+        <attr name="emptyView" format="integer|reference"/>
+        <attr name="inAnim" format="integer|reference"/>
+        <attr name="outAnim" format="integer|reference"/>
+        <attr name="android:padding"/>
+        <attr name="android:paddingLeft"/>
+        <attr name="android:paddingTop"/>
+        <attr name="android:paddingRight"/>
+        <attr name="android:paddingBottom"/>
+        <attr name="android:clipToPadding"/>
+    </declare-styleable>
 </resources>

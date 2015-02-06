@@ -32,11 +32,13 @@ android {
 
         // dex突破65535的限制
         multiDexEnabled true
-        manifestPlaceholders = [LEANCLOUD_CHANNEL_ID: "default"]
+        useJack = false
+
 
         renderscriptTargetApi 21
         renderscriptSupportModeEnabled true
 
+        manifestPlaceholders = [LEANCLOUD_CHANNEL_ID: "default"]
         buildConfigField "String", "BUGLY_APP_ID", "\"${buglyAppId}\""
         buildConfigField "String", "WECHAT_APP_ID", "\"${wechatAppId}\""
         buildConfigField "String", "LEANCLOUD_APP_ID", "\"${leancloudAppId}\""
@@ -44,6 +46,9 @@ android {
 
         buildConfigField "String", "APP_DOWNLOAD_URL", "\"${appDownloadUrl}\""
         buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
+    }
+    dexOptions {
+        javaMaxHeapSize "2048M"
     }
     signingConfigs {
         debug {
@@ -59,15 +64,15 @@ android {
             minifyEnabled false
             zipAlignEnabled false
 
-            applicationVariants.all { variant ->
-                variant.outputs.each { output ->
-                    def outputFile = output.outputFile
-                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
-                        def fileName = "sky31_radio_v${defaultConfig.versionName}_${releaseTime()}_${variant.productFlavors[0].name}.apk"
-                        output.outputFile = new File(outputFile.parent, fileName)
-                    }
-                }
-            }
+//            applicationVariants.all { variant ->
+//                variant.outputs.each { output ->
+//                    def outputFile = output.outputFile
+//                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+//                        def fileName = "sky31_radio_v${defaultConfig.versionName}_${releaseTime()}_${variant.productFlavors[0].name}.apk"
+//                        output.outputFile = new File(outputFile.parent, fileName)
+//                    }
+//                }
+//            }
             signingConfig signingConfigs.release
         }
         debug {
@@ -83,10 +88,12 @@ android {
     }
     productFlavors {
         play{}
-        xiaomi {}
-        _360 {}
-        baidu {}
-        wandoujia {}
+//        meizu{}
+//        yinyongbao{}
+//        xiaomi {}
+//        _360 {}
+//        baidu {}
+//        wandoujia {}
     }
 
     productFlavors.all {
@@ -129,6 +136,9 @@ dependencies {
     compile project(':DiscreateSeekBar')
     compile 'org.michaelevans.colorart:library:0.0.2'
     compile 'com.readystatesoftware.systembartint:systembartint:1.0.4'
+    compile('de.psdev.licensesdialog:licensesdialog:1.6.0') {
+        exclude module: 'support-v4'
+    }
     compile project(':leancloud')
 }
 File propFile = file('signing.properties');

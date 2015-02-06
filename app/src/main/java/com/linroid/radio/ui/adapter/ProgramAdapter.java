@@ -24,14 +24,8 @@ import butterknife.InjectView;
 public class ProgramAdapter extends RecyclerView.Adapter<ProgramAdapter.ViewHolder>{
     List<Program> programList = new ArrayList<>();
     Picasso picasso;
-    OnLoadModeListener moreListener;
-    boolean isLoading = true;
     public ProgramAdapter(Picasso picasso) {
         this.picasso = picasso;
-    }
-
-    public void setOnLoadMoreListener(OnLoadModeListener moreListener) {
-        this.moreListener = moreListener;
     }
 
     @Override
@@ -46,10 +40,10 @@ public class ProgramAdapter extends RecyclerView.Adapter<ProgramAdapter.ViewHold
         Program program = programList.get(i);
         holder.titleTV.setText(program.getTitle());
         holder.authorTV.setText(program.getAuthor());
-        picasso.load(program.getThumbnail()).into(holder.thumbnailIV);
-        if(i==programList.size()-1 && moreListener!=null && moreListener.hasMore() && !isLoading){
-            moreListener.onLoadMore();
-        }
+        picasso.load(program.getThumbnail())
+                .placeholder(R.drawable.holde_image)
+                .into(holder.thumbnailIV);
+
     }
 
     @Override
@@ -57,14 +51,12 @@ public class ProgramAdapter extends RecyclerView.Adapter<ProgramAdapter.ViewHold
         return programList==null ? 0 :  programList.size();
     }
 
-    public void setListData(List listData) {
+    public void setListData(List<Program> listData) {
         this.programList.clear();
         this.programList = listData;
-        isLoading = false;
     }
     public void addMoreData(List<Program> moreData){
         this.programList.addAll(moreData);
-        isLoading = false;
     }
 
     public List<Program> getProgramList() {
@@ -91,9 +83,5 @@ public class ProgramAdapter extends RecyclerView.Adapter<ProgramAdapter.ViewHold
             int position = getPosition();
             RadioUtils.sendPlayList(v.getContext(), programList, position);
         }
-    }
-    public static interface OnLoadModeListener{
-        boolean hasMore();
-        void onLoadMore();
     }
 }

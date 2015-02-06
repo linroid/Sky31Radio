@@ -3,6 +3,7 @@ package com.linroid.radio.module;
 import android.content.Context;
 
 import com.linroid.radio.App;
+import com.linroid.radio.BuildConfig;
 import com.linroid.radio.service.RadioPlaybackService;
 
 import java.io.File;
@@ -12,6 +13,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import timber.log.Timber;
 
 @Module(
         injects = {
@@ -33,6 +35,13 @@ public class AppModule {
     @Provides
     Context provideContext() {
         return this.ctx;
+    }
+
+    @Provides
+    Timber.Tree provideTimberTree(){
+        return BuildConfig.DEBUG ?
+                new Timber.DebugTree() :
+                new Timber.HollowTree();
     }
 
 

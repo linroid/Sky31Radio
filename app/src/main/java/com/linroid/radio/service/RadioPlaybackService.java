@@ -249,7 +249,9 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
                 // playback. We don't release the media player because playback
                 // is likely to resume
                 Timber.i("AudioManager.AUDIOFOCUS_LOSS_TRANSIENT");
-                player.pause();
+                if(player!=null){
+                    player.pause();
+                }
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
@@ -309,6 +311,9 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
         }
 
         private void next() {
+            if(playingIndex==programList.size()-1){
+                return;
+            }
             playingIndex = (playingIndex + 1) % programList.size();
             loadProgram();
         }
@@ -377,7 +382,7 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
         @Override
         public void onBufferingUpdate(MediaPlayer mp, int percent) {
             if(percent == 100){
-                Timber.d("buffer complete");
+                Timber.d("buffer complete:%d%%", percent);
             }
         }
 

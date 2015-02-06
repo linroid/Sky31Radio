@@ -20,5 +20,14 @@
 你也来听听吧:%s</string>
     <string name="tpl_wx_share_description" formatted="false">我正在%s聆听%s的声音</string>
     <string name="pref_feedback">feedback</string>
+    <string name="pref_donate">donate</string>
+    <string name="pref_license">license</string>
+    <string name="msg_donate">已经复制支付宝账号:linroid@gmail.com</string>
+    <string name="pref_allow_new_program_notification">allow_new_program_notification</string>
+    <string name="loading_text">加载中…</string>
+    <string name="loading_error_text">出现错误—</string>
+    <string name="btn_error_retry">再试试</string>
+    <string name="btn_empty_retry">再试试</string>
+    <string name="empty_message">什么也没有</string>
 
 </resources>

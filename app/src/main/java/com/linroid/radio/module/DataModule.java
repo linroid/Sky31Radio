@@ -92,7 +92,7 @@ public class DataModule {
     }
     @Provides
     @Singleton
-    RestAdapter provideRestAdapter(Gson gson, OkHttpClient okHttpClient){
+    RestAdapter provideRestAdapter(Gson gson, OkHttpClient okHttpClient, final Context ctx){
         return new RestAdapter.Builder()
                 .setErrorHandler(new ErrorHandler() {
                     @Override

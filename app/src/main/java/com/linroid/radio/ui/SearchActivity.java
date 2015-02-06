@@ -25,7 +25,6 @@ public class SearchActivity extends InjectableActivity {
                 .beginTransaction()
                 .replace(R.id.program_list_container, resultFragment)
                 .commit();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override

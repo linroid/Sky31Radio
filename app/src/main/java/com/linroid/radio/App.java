@@ -1,6 +1,8 @@
 package com.linroid.radio;
 
 import android.app.Application;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.avos.avoscloud.AVAnalytics;
 import com.avos.avoscloud.AVInstallation;
@@ -13,6 +15,8 @@ import com.linroid.radio.ui.HomeActivity;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import dagger.ObjectGraph;
 import timber.log.Timber;
 
@@ -21,15 +25,18 @@ import timber.log.Timber;
  */
 
 public class App extends Application
-        implements Injector {
+        implements Injector, SharedPreferences.OnSharedPreferenceChangeListener {
     ObjectGraph mObjectGraph;
 
+    @Inject
+    Timber.Tree tree;
     public void onCreate() {
         super.onCreate();
-        Timber.Tree tree = BuildConfig.DEBUG ? new Timber.DebugTree() : new Timber.HollowTree();
-        Timber.plant(tree);
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
         mObjectGraph = ObjectGraph.create(getModules().toArray());
         inject(this);
+
+        Timber.plant(tree);
         initLeancloud();
     }
 
@@ -38,6 +45,7 @@ public class App extends Application
         AVInstallation.getCurrentInstallation().saveInBackground();
         PushService.setDefaultPushCallback(this, HomeActivity.class);
         AVAnalytics.enableCrashReport(this, true);
+        setNotification(PreferenceManager.getDefaultSharedPreferences(this));
     }
 
     public List<Object> getModules() {
@@ -54,5 +62,20 @@ public class App extends Application
 
     public ObjectGraph plus(Object[] modules) {
         return this.mObjectGraph.plus(modules);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(key.equals(getString(R.string.pref_allow_new_program_notification))){
+            setNotification(sharedPreferences);
+        }
+    }
+    private void setNotification(SharedPreferences sharedPreferences){
+        boolean enableNotification = sharedPreferences.getBoolean(getString(R.string.pref_allow_new_program_notification), true);
+        if(enableNotification){
+            PushService.subscribe(this, Constants.PREF_NEW_RADIO, HomeActivity.class);
+        }else{
+            PushService.unsubscribe(this, Constants.PREF_NEW_RADIO);
+        }
     }
 }

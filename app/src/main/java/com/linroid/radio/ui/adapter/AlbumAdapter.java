@@ -48,7 +48,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
         Album album = albumList.get(i);
         holder.nameTV.setText(album.getName());
         holder.programCountTV.setText(String.format(programCountTpl, album.getProgramCount()));
-        picasso.load(album.getCover()).into(holder.thumbnailIV);
+        picasso.load(album.getCover()).placeholder(R.drawable.holde_image).into(holder.thumbnailIV);
     }
 
     @Override

@@ -3,4 +3,9 @@
     <item name="toolbar" type="id"/>
     <item name="recycler" type="id"/>
     <item name="refresher" type="id"/>
+    <item name="btn_retry" type="id"/>
+    <item name="content_loader" type="id"/>
+    <item name="error_view" type="id" />
+    <item name="empty_view" type="id" />
+    <item name="loading_view" type="id" />
 </resources>

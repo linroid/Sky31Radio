@@ -2,7 +2,6 @@ package com.linroid.radio.ui.fragment;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +16,7 @@ import com.linroid.radio.data.DiskCacheManager;
 import com.linroid.radio.model.Album;
 import com.linroid.radio.ui.adapter.AlbumAdapter;
 import com.linroid.radio.ui.base.InjectableFragment;
+import com.linroid.radio.view.ContentLoaderView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -29,20 +29,19 @@ import butterknife.InjectView;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
-import rx.Subscription;
+import rx.android.app.AppObservable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
-import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
 
-public class AlbumListFragment extends InjectableFragment
-        implements SwipeRefreshLayout.OnRefreshListener {
+public class AlbumListFragment extends InjectableFragment implements ContentLoaderView.OnRefreshListener {
     public static final String KEY_ALBUM = "key_album";
+
+    @InjectView(R.id.content_loader)
+    ContentLoaderView loaderView;
     @InjectView(R.id.recycler)
     RecyclerView recyclerView;
-    @InjectView(R.id.refresher)
-    SwipeRefreshLayout refreshLayout;
 
     @Inject
     Picasso picasso;
@@ -51,8 +50,6 @@ public class AlbumListFragment extends InjectableFragment
     @Inject
     DiskCacheManager cacheManager;
     boolean hasLoaded = false;
-    PublishSubject<List<Album>> albumRequest;
-    Subscription subscription;
     AlbumAdapter adapter;
     AlbumAdapter.OnAlbumSelectedListener listener;
     public static AlbumListFragment newInstance() {
@@ -69,13 +66,16 @@ public class AlbumListFragment extends InjectableFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         adapter = new AlbumAdapter(getActivity(), picasso);
         adapter.setOnAlbumSelectedListener(listener);
+
         if(savedInstanceState!=null){
             List<Album> albumList = savedInstanceState.getParcelableArrayList(KEY_ALBUM);
             adapter.setListData(albumList);
+        }else{
+            loadData();
         }
-        loadData();
     }
 
     @Override
@@ -93,17 +93,16 @@ public class AlbumListFragment extends InjectableFragment
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
-        recyclerView.setAdapter(adapter);
-        refreshLayout.setColorSchemeResources(
-                android.R.color.holo_blue_light,
-                android.R.color.holo_purple,
-                android.R.color.holo_green_light,
-                android.R.color.holo_red_light,
-                android.R.color.holo_orange_light
-        );
-        refreshLayout.setOnRefreshListener(this);
+
+        loaderView.setAdapter(adapter);
+        loaderView.setOnRefreshListener(this);
 
         return  view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
     }
 
     @Override
@@ -127,22 +126,10 @@ public class AlbumListFragment extends InjectableFragment
         super.onDetach();
         adapter.setOnAlbumSelectedListener(null);
     }
-
-    @Override
-    public void onRefresh() {
-        Timber.i("onRefresh");
-        loadData();
-    }
     public void loadData(){
-        if(refreshLayout!=null && !refreshLayout.isRefreshing()){
-            refreshLayout.setRefreshing(true);
-        }
-        if(albumRequest==null || subscription.isUnsubscribed()){
-            albumRequest = PublishSubject.create();
-            subscription = albumRequest.subscribe(observer);
-        }
         if(!hasLoaded){
-            Observable.create(new Observable.OnSubscribe<List<Album>>() {
+            AppObservable.bindFragment(this,
+                    Observable.create(new Observable.OnSubscribe<List<Album>>() {
                 @Override
                 public void call(Subscriber<? super List<Album>> subscriber) {
                     if (cacheManager.exits(DiskCacheManager.KEY_ALBUM)) {
@@ -151,11 +138,10 @@ public class AlbumListFragment extends InjectableFragment
                             subscriber.onNext(albums);
                         }
                     }
-                    subscriber.onCompleted();
                 }
-            }).subscribe(albumRequest);
+            })).subscribe(observer);
         }
-        apiService.listAlbums()
+        AppObservable.bindFragment(this, apiService.listAlbums())
                 .map(new Func1<List<Album>, List<Album>>() {
                     @Override
                     public List<Album> call(List<Album> albums) {
@@ -164,21 +150,19 @@ public class AlbumListFragment extends InjectableFragment
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(albumRequest);
+                .subscribe(observer);
     }
 
     Observer<List<Album>> observer = new Observer<List<Album>>() {
         @Override
         public void onCompleted() {
-            if(refreshLayout!=null && refreshLayout.isRefreshing()){
-                refreshLayout.setRefreshing(false);
-            }
+            Timber.i("listAlbum onCompleted");
         }
 
         @Override
         public void onError(Throwable throwable) {
-            onCompleted();
             Timber.e(throwable, "发生错误: %s", throwable.getMessage());
+            loaderView.notifyLoadFailed(throwable);
         }
 
         @Override
@@ -188,4 +172,9 @@ public class AlbumListFragment extends InjectableFragment
             adapter.notifyDataSetChanged();
         }
     };
+
+    @Override
+    public void onRefresh(boolean fromSwipe) {
+        loadData();
+    }
 }

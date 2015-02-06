@@ -41,3 +41,22 @@
 -keep class com.tencent.mm.sdk.openapi.WXMediaMessage {*;}
 -keep class com.tencent.mm.sdk.openapi.** implements com.tencent.mm.sdk.openapi.WXMediaMessage$IMediaObject {*;}
 -keep class com.tencent.** {*;}
+
+#Jack
+-include
+-basedirectory
+-injars
+-outjars // only 1 output jar supported
+-libraryjars
+-dontoptimize  // required: Jack does not optimize
+-dontpreverify // required: Jack does not preverify
+-dontskipnonpubliclibraryclasses
+-dontskipnonpubliclibraryclassmembers
+-forceprocessing
+-keep
+-keepclassmembers
+-keepclasseswithmembers
+-keepnames
+-keepclassmembernames
+-keepclasseswithmembernames
+-printseeds

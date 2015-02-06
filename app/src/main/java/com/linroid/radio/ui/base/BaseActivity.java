@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.MenuItem;
 
 import com.avos.avoscloud.AVAnalytics;
@@ -33,6 +34,9 @@ public abstract class BaseActivity extends ActionBarActivity {
         ButterKnife.inject(this);
         if(toolbar!=null){
             setSupportActionBar(toolbar);
+        }
+        if(!TextUtils.isEmpty(NavUtils.getParentActivityName(this))){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         if(Build.VERSION.SDK_INT <= 19){
             tintManager = new SystemBarTintManager(this);
