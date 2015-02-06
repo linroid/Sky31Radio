@@ -209,10 +209,15 @@ public class ContentLoaderView extends FrameLayout implements SwipeRefreshLayout
     }
 
     public void notifyLoadFailed(Throwable error){
+        if(refreshLayout.isRefreshing()){
+            refreshLayout.setRefreshing(false);
+        }
+        loadMore = false;
         if(currentPage==1 && recyclerView.getLayoutManager().getChildCount() == 0){
             errorMessageTV.setText(error.getMessage());
             setDisplayView(errorView);
         }else{
+            setDisplayView(contentView);
             Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }

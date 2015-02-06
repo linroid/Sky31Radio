@@ -15,6 +15,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -61,6 +62,7 @@ public class DataModule {
     OkHttpClient provideOkHttp(Cache cache) {
         OkHttpClient okHttpClient = new OkHttpClient();
         okHttpClient.setCache(cache);
+        okHttpClient.setConnectTimeout(30, TimeUnit.SECONDS);
         return okHttpClient;
     }
     @Provides

@@ -40,19 +40,20 @@ public class SettingsFragment extends PreferenceFragment {
                 return true;
             }
         });
-        findPreference(getString(R.string.pref_donate)).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+        findPreference(getString(R.string.pref_donate)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                openDonate(newValue.toString());
+            public boolean onPreferenceClick(Preference preference) {
+                openDonate();
                 return true;
             }
         });
     }
 
-    private void openDonate(String alipayAccount) {
+    private void openDonate() {
+        String alipayAccount = getString(R.string.alipay_account);
         ClipboardManager cm = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
         cm.setPrimaryClip(ClipData.newPlainText("AlipayAccount", alipayAccount));
-        Toast.makeText(getActivity(), R.string.msg_donate, Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(), getString(R.string.msg_donate, alipayAccount), Toast.LENGTH_LONG).show();
     }
 
     private void openFeedback(){
