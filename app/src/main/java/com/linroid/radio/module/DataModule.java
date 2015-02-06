@@ -5,6 +5,7 @@ import android.net.Uri;
 
 import com.google.gson.Gson;
 import com.linroid.radio.BuildConfig;
+import com.linroid.radio.R;
 import com.linroid.radio.data.ApiService;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.OkHttpClient;
@@ -98,7 +99,18 @@ public class DataModule {
                     @Override
                     public Throwable handleError(RetrofitError retrofitError) {
                         Timber.e(retrofitError, "请求出现错误:%s", retrofitError.getUrl());
-                        return retrofitError;
+                        RetrofitError.Kind kind = retrofitError.getKind();
+                        String message;
+                        if(RetrofitError.Kind.NETWORK.equals(kind)){
+                            message = ctx.getString(R.string.network_error);
+                        }else if(RetrofitError.Kind.HTTP.equals(kind)){
+                            message = ctx.getString(R.string.http_error);
+                        }else if(RetrofitError.Kind.CONVERSION.equals(kind)){
+                            message = ctx.getString(R.string.conversion_error);
+                        }else{
+                            message = ctx.getString(R.string.unexpected_error);
+                        }
+                        return new Exception(message);
                     }
                 })
                 .setClient(new OkClient(okHttpClient))

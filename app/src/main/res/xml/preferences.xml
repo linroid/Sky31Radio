@@ -53,12 +53,6 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="关于">
         <Preference
-            android:key="@string/pref_feedback"
-            android:title="意见反馈"
-            android:summary="来吐槽一下把~">
-            <!--<intent android:action="com.avos.avoscloud.action.feedback"/>-->
-        </Preference>
-        <Preference
             android:title="开发者"
             android:summary="张林">
             <intent android:action="android.intent.action.VIEW"
