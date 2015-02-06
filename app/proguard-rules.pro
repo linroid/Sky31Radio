@@ -60,3 +60,4 @@
 -keepclassmembernames
 -keepclasseswithmembernames
 -printseeds
+-keep class com.tencent.** {*;}

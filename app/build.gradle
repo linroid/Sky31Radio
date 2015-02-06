@@ -34,6 +34,7 @@ android {
         multiDexEnabled true
         useJack = false
 
+        manifestPlaceholders = [LEANCLOUD_CHANNEL_ID: "default"]
 
         renderscriptTargetApi 21
         renderscriptSupportModeEnabled true
@@ -63,7 +64,7 @@ android {
             shrinkResources false
             minifyEnabled false
             zipAlignEnabled false
-
+//
 //            applicationVariants.all { variant ->
 //                variant.outputs.each { output ->
 //                    def outputFile = output.outputFile
@@ -108,13 +109,12 @@ android {
     lintOptions {
         abortOnError false
     }
-
 }
 //configurations {
 //    all*.exclude group: 'com.android.support', module: 'support-v13'
 //}
 mdicons {
-    pattern '((fast_forward|fast_rewind|pause|play_arrow|refresh|search)_white_24dp)|((fast_forward|fast_rewind|pause|play_arrow)_white_48dp)'
+    pattern '((pause|play_arrow|refresh|search)_white_24dp)|((pause|play_arrow)_white_48dp)'
 }
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])

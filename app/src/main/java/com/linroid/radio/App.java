@@ -33,10 +33,10 @@ public class App extends Application
     public void onCreate() {
         super.onCreate();
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
+        Timber.Tree tree = BuildConfig.DEBUG ? new Timber.DebugTree() : new Timber.HollowTree();
+        Timber.plant(tree);
         mObjectGraph = ObjectGraph.create(getModules().toArray());
         inject(this);
-
-        Timber.plant(tree);
         initLeancloud();
     }
 

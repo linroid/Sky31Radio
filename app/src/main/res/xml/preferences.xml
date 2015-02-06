@@ -4,6 +4,22 @@
             android:key="@string/pref_allow_new_program_notification"
             android:defaultValue="true"
             android:title="当有新节目时"/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="通知设置">
+        <CheckBoxPreference
+            android:key="allow_new_program_notification"
+            android:defaultValue="true"
+            android:title="当有新节目时"/>
+        </PreferenceCategory>
+    <PreferenceCategory
+        android:title="缓存设置">
+        <EditTextPreference
+            android:title="缓存大小"
+            android:key="cache_size"
+            android:summary="100MB"/>
+        <Preference
+            android:title="清空缓存"/>
         </PreferenceCategory>
     <PreferenceCategory
         android:title="链接">
@@ -36,6 +52,12 @@
         </Preference>
     </PreferenceCategory>
     <PreferenceCategory android:title="关于">
+        <Preference
+            android:key="@string/pref_feedback"
+            android:title="意见反馈"
+            android:summary="来吐槽一下把~">
+            <!--<intent android:action="com.avos.avoscloud.action.feedback"/>-->
+        </Preference>
         <Preference
             android:title="开发者"
             android:summary="张林">
