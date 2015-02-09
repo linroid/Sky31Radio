@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#dd000000">
+    <ImageView
+        android:id="@+id/thumbnail"
+        android:layout_width="@dimen/notification_expanded_height"
+        android:layout_height="@dimen/notification_expanded_height"
+        android:layout_alignParentLeft="true"
+        android:src="@drawable/ic_launcher_square"
+        android:scaleType="centerCrop" />
+
+    <LinearLayout
+        android:id="@+id/buttons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/thumbnail"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@id/thumbnail"
+        android:divider="?android:listDivider"
+        android:dividerPadding="12.0dip"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:showDividers="middle" >
+
+        <ImageButton
+            android:id="@+id/btn_skip_previous"
+            android:layout_width="0.0dip"
+            android:layout_height="64dp"
+            android:layout_weight="1.0"
+            android:background="?android:selectableItemBackground"
+            android:padding="10.0dip"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_action_skip_previous" />
+
+        <ImageButton
+            android:id="@+id/btn_play_pause"
+            android:layout_width="0.0dip"
+            android:layout_height="64dp"
+            android:layout_weight="1.0"
+            android:background="?android:selectableItemBackground"
+            android:padding="10.0dip"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_stat_action_pause" />
+
+        <ImageButton
+            android:id="@+id/btn_skip_next"
+            android:layout_width="0.0dip"
+            android:layout_height="64dp"
+            android:layout_weight="1.0"
+            android:background="?android:selectableItemBackground"
+            android:padding="10.0dip"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_action_skip_next" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="1.0px"
+        android:layout_above="@id/buttons"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@id/thumbnail"
+        android:background="?android:dividerHorizontal" />
+
+    <ImageButton
+        android:id="@+id/stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="?android:selectableItemBackground"
+        android:padding="8.0dip"
+        android:src="@drawable/ic_action_close" />
+
+    <LinearLayout
+        android:id="@+id/textarea"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="center_vertical"
+        android:layout_toLeftOf="@id/stop"
+        android:layout_toRightOf="@id/thumbnail"
+        android:orientation="vertical"
+        android:paddingLeft="8dp"
+        android:paddingTop="8.0dip" >
+
+        <TextView
+            android:id="@+id/program_title"
+            style="@android:style/TextAppearance.StatusBar.EventContent.Title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:fadingEdge="horizontal"
+            android:focusable="true"
+            android:singleLine="true"
+            android:text="我们生活在一个现实的世界里"/>
+
+        <TextView
+            android:id="@+id/program_author"
+            style="@android:style/TextAppearance.StatusBar.EventContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:ellipsize="marquee"
+            android:layout_marginTop="6dp"
+            android:fadingEdge="horizontal"
+            android:maxLines="1"
+            android:text="听之" />
+
+    </LinearLayout>
+</RelativeLayout>

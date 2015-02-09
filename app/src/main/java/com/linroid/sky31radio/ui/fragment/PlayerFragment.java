@@ -184,10 +184,15 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
     }
     private void updatePlayingProgram(final Program playingProgram){
         this.program = playingProgram;
+        if(playingProgram==null){
+            disablePlayerBar();
+            return;
+        }
+
+        playPauseButton.setEnabled(true);
         slidingUpPanelLayout.setSlidingEnabled(true);
         viewSwitcher.setDisplayedChild(0);
         String playedCountText = getResources().getString(R.string.tpl_played_count, program.getTotalPlay());
-
         playedCountTV.setText(playedCountText);
         playerAuthorTV.setText(program.getAuthor());
         playerProgramNameTV.setText(program.getTitle());
@@ -227,6 +232,15 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
                     });
     }
 
+    private void disablePlayerBar() {
+        playPauseButton.setPlaying(false);
+        playerThumbnailIV.setImageResource(R.drawable.ic_launcher_square);
+        playerProgramNameTV.setText(R.string.app_name);
+        if(slidingUpPanelLayout.collapsePanel()){
+            slidingUpPanelLayout.setSlidingEnabled(false);
+        }
+    }
+
     @OnClick({R.id.article_equalizer_switcher, R.id.article})
     public void onSwitcherClick(){
         if(viewSwitcher.getDisplayedChild() == 0) {
@@ -261,6 +275,10 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
 
     private void nextUpdate() {
         try {
+            if(service==null){
+                playPauseButton.setPlaying(false);
+                return;
+            }
             handler.removeMessages(MSG_UPDATE);
             long position = service.getPosition();
             long delay = 1000 - position%1000;
@@ -378,9 +396,7 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
         try {
             equalizerView.linkPlayer(service.getPlayerSessionId());
             equalizerView.setEnabled(slidingUpPanelLayout.isPanelExpanded());
-            if(service.isPlaying()){
-                updatePlayingProgram(service.getPlayingProgram());
-            }
+            updatePlayingProgram(service.getPlayingProgram());
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -393,6 +409,8 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
         this.service = null;
         handler.removeMessages(MSG_UPDATE);
         equalizerView.release();
+        disablePlayerBar();
+        playPauseButton.setEnabled(false);
     }
     private void showPlayingStatus(boolean playing){
         actionPlayPauseButton.setPlaying(playing);
@@ -465,6 +483,7 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
         @Override
         public void onPlay() {
             RadioUtils.play(getActivity());
+            nextUpdate();
         }
 
         @Override

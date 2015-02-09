@@ -14,6 +14,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.audiofx.AudioEffect;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -21,6 +22,7 @@ import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.widget.RemoteViews;
 
 import com.linroid.sky31radio.App;
 import com.linroid.sky31radio.IRadioService;
@@ -197,23 +199,52 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
                 .setContentTitle(playingProgram.getTitle())
                 .setContentText(playingProgram.getAuthor())
                 .setContentIntent(contentIntent)
-                .setShowWhen(true)
-                .addAction(R.drawable.ic_stat_action_skip_previous, null, createAction(ACTION_PREVIOUS))
-                .addAction(playButtonIconResId, null, createAction(playButtonAction))
-                .addAction(R.drawable.ic_stat_action_skip_next, null, createAction(ACTION_NEXT));
+                .setShowWhen(true);
+//                .setContent(collapseViews);
+////                .addAction(R.drawable.ic_stat_action_skip_previous, null, createAction(ACTION_PREVIOUS))
+////                .addAction(playButtonIconResId, null, createAction(playButtonAction))
+////                .addAction(R.drawable.ic_stat_action_skip_next, null, createAction(ACTION_NEXT));
 
-            picasso.load(playingProgram.getThumbnail()).into(new Target() {
+        RemoteViews collapsedViews = new RemoteViews(getPackageName(), R.layout.collapsed_notification);
+        collapsedViews.setTextViewText(R.id.program_title, playingProgram.getTitle());
+        collapsedViews.setImageViewResource(R.id.btn_play_pause, playButtonIconResId);
+        collapsedViews.setOnClickPendingIntent(R.id.btn_play_pause, createAction(playButtonAction));
+        collapsedViews.setOnClickPendingIntent(R.id.btn_skip_next, createAction(ACTION_NEXT));
+
+        builder.setContent(collapsedViews);
+        final Notification notification = builder.build();
+        notification.contentView = collapsedViews;
+
+        if(Build.VERSION.SDK_INT >= 16){
+            RemoteViews expandedViews = new RemoteViews(getPackageName(), R.layout.expanded_notification);
+            expandedViews.setTextViewText(R.id.program_title, playingProgram.getTitle());
+            expandedViews.setTextViewText(R.id.program_author, playingProgram.getAuthor());
+            expandedViews.setOnClickPendingIntent(R.id.btn_skip_next, createAction(ACTION_NEXT));
+            expandedViews.setOnClickPendingIntent(R.id.btn_skip_previous, createAction(ACTION_PREVIOUS));
+            expandedViews.setOnClickPendingIntent(R.id.btn_play_pause, createAction(playButtonAction));
+            expandedViews.setOnClickPendingIntent(R.id.stop, createAction(ACTION_STOP));
+            expandedViews.setImageViewResource(R.id.btn_play_pause, playButtonIconResId);
+            notification.bigContentView = expandedViews;
+        }
+            picasso.load(playingProgram.getThumbnail())
+                    .into(new Target() {
                 @Override
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+//                    builder.setLargeIcon(bitmap);
+//                    Notification notification = builder.build();
+                    notification.contentView.setImageViewBitmap(R.id.thumbnail, bitmap);
+                    if(Build.VERSION.SDK_INT >= 16){
+                        notification.bigContentView.setImageViewBitmap(R.id.thumbnail, bitmap);
+                    }
                     if(isPlaying) {
-                        builder.setLargeIcon(bitmap);
-                        Notification notification = builder.build();
+                        notification.flags |= Notification.FLAG_NO_CLEAR;
                         notificationManager.notify(NOTIFICATION_ID, notification);
+
                         startForeground(NOTIFICATION_ID, notification);
                     }else {
                         stopForeground(false);
-                        builder.setAutoCancel(true);
-                        Notification notification = builder.build();
+//                        builder.setAutoCancel(true);
+                        notification.flags = 0;
                         notification.deleteIntent = createAction(ACTION_STOP);
                         notificationManager.notify(NOTIFICATION_ID, notification);
                     }
@@ -221,7 +252,6 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
 
                 @Override
                 public void onBitmapFailed(Drawable errorDrawable) {
-
                 }
 
                 @Override
