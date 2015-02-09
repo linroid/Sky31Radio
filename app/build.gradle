@@ -18,7 +18,7 @@ def wechatAppId = "wx0a74babb5d25de74"
 def leancloudAppId = "tppfzdpnnb99brtkh71phf5mkyba5t5wv8kw2n6tmy9wu45v"
 def leancloudAppKey = "f8s6xeebxw1qbqupgh8rjtuqb2nk1xfighsnwfl0zi71hcul"
 
-def appDownloadUrl = "http://fir.im/sky31radio/info"
+def appDownloadUrl = "http://fir.im/sky31radio"
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
