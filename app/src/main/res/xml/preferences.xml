@@ -19,8 +19,12 @@
         </Preference>
     </PreferenceCategory>
     <PreferenceCategory android:title="感谢">
-        <Preference android:title="会哥"
-            android:summary="图标设计"/>
+        <Preference android:title="\@成会要洗心革面做笨蛋"
+            android:summary="图标设计">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="http://weibo.cn/u/2885293754"/>
+        </Preference>
     </PreferenceCategory>
     <PreferenceCategory android:title="贡献">
         <Preference
