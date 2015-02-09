@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.linroid.radio">
+    package="com.linroid.sky31radio">
 
     <uses-sdk tools:overrideLibrary="com.moshx.indicators" />
 
@@ -11,7 +11,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <application
-        android:name=".App"
+        android:name="com.linroid.sky31radio.App"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -19,7 +19,7 @@
         <meta-data android:name="Channel ID" android:value="${LEANCLOUD_CHANNEL_ID}"/>
 
         <activity
-            android:name=".ui.HomeActivity"
+            android:name="com.linroid.sky31radio.ui.HomeActivity"
             android:label="@string/app_name"
             android:launchMode="singleInstance">
             <intent-filter>
@@ -29,25 +29,25 @@
         </activity>
 
         <service
-            android:name=".service.RadioPlaybackService"
+            android:name="com.linroid.sky31radio.service.RadioPlaybackService"
             android:enabled="true"
-            android:exported="true"/>
+            android:process=":player"/>
 
         <activity
-            android:name=".ui.SettingsActivity"
+            android:name="com.linroid.sky31radio.ui.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".ui.HomeActivity">
+            android:parentActivityName="com.linroid.sky31radio.ui.HomeActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.linroid.radio.ui.HomeActivity" />
+                android:value="com.linroid.sky31radio.ui.HomeActivity" />
         </activity>
         <activity
-            android:name=".ui.SearchActivity"
+            android:name="com.linroid.sky31radio.ui.SearchActivity"
             android:label="@string/title_activity_search"
-            android:parentActivityName=".ui.HomeActivity">
+            android:parentActivityName="com.linroid.sky31radio.ui.HomeActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.linroid.radio.ui.HomeActivity" />
+                android:value="com.linroid.sky31radio.ui.HomeActivity" />
         </activity>
     </application>
 

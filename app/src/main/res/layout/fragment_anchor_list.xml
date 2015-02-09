@@ -1,8 +1,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.linroid.radio.ui.fragment.AnchorListFragment">
-    <com.linroid.radio.view.ContentLoaderView
+    tools:context="com.linroid.sky31radio.ui.fragment.AnchorListFragment">
+    <com.linroid.sky31radio.view.ContentLoaderView
         android:id="@id/content_loader"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

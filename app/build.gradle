@@ -18,13 +18,13 @@ def wechatAppId = "wx0a74babb5d25de74"
 def leancloudAppId = "tppfzdpnnb99brtkh71phf5mkyba5t5wv8kw2n6tmy9wu45v"
 def leancloudAppKey = "f8s6xeebxw1qbqupgh8rjtuqb2nk1xfighsnwfl0zi71hcul"
 
-def appDownloadUrl = "http://radio.sky31.com"
+def appDownloadUrl = "http://fir.im/sky31radio/info"
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        applicationId "com.linroid.radio"
+        applicationId "com.linroid.sky31radio"
         minSdkVersion 14
         targetSdkVersion 21
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
@@ -88,14 +88,12 @@ android {
         }
     }
     productFlavors {
-        play{}
         meizu{}
         tencent{}
         xiaomi {}
-        _360 {}
-        baidu {}
         wandoujia {}
         sky31{}
+        fir{}
     }
 
     productFlavors.all {

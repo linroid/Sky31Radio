@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="bottom"
-        android:name="com.linroid.radio.ui.fragment.SettingsFragment"
+        android:name="com.linroid.sky31radio.ui.fragment.SettingsFragment"
         android:id="@+id/settings" />
 
 </LinearLayout>

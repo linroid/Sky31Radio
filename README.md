@@ -10,8 +10,10 @@
 四季电台官方QQ：1485896141【可聊天 推送更新】
 邮箱：radiosky31@qq.com
 
-##界面:
+#界面:
 - 主播列表
     ![主播列表](./screenshots/device-2015-01-17-100644.png)
 - 节目列表
 	![节目列表](./screenshots/device-2015-01-17-102328.png)
+- 播放器
+    ![播放器](./screenshots/device-2015-02-07-141957.png)

@@ -2,9 +2,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.linroid.radio.ui.fragment.ProgramListFragment"
+    tools:context="com.linroid.sky31radio.ui.fragment.ProgramListFragment"
     android:background="#eeeeee">
-    <com.linroid.radio.view.ContentLoaderView
+    <com.linroid.sky31radio.view.ContentLoaderView
         android:id="@id/content_loader"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

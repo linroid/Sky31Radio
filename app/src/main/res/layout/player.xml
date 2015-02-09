@@ -58,7 +58,7 @@
                             android:layout_gravity="bottom|center_horizontal"/>
 
                     </android.support.v7.widget.CardView>
-                    <com.linroid.radio.view.EqualizerView
+                    <com.linroid.sky31radio.view.EqualizerView
                         android:id="@+id/visualizer"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -113,7 +113,7 @@
                 <!--android:textColor="@android:color/white"-->
                 <!--android:textStyle="bold"-->
                 <!--tools:text="播放次数:1111" />-->
-            <com.linroid.radio.view.PlayPauseButton
+            <com.linroid.sky31radio.view.PlayPauseButton
                 android:id="@+id/btn_play_pause"
                 style="?android:borderlessButtonStyle"
                 android:layout_width="wrap_content"

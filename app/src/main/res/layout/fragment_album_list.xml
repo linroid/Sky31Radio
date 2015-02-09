@@ -1,12 +1,15 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.linroid.radio.ui.fragment.AlbumListFragment">
-    <com.linroid.radio.view.ContentLoaderView
+    tools:context="com.linroid.sky31radio.ui.fragment.AlbumListFragment">
+    <com.linroid.sky31radio.view.ContentLoaderView
         android:id="@id/content_loader"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="8dp"
+        android:paddingTop="4dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="8dp"
         android:clipToPadding="false"/>
     <include layout="@layout/toolbar_shadow"
         android:layout_height="@dimen/shadow_height"

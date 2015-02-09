@@ -14,7 +14,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<com.linroid.radio.view.PlayPauseProgressButton xmlns:android="http://schemas.android.com/apk/res/android"
+<com.linroid.sky31radio.view.PlayPauseProgressButton xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/playPauseProgressButton"
     android:layout_width="match_parent"
@@ -22,7 +22,7 @@
     android:visibility="visible">
 
     <!-- TODO: Figure out why scaleType: centerInside isn't properly scaling up -->
-    <com.linroid.radio.view.PlayPauseButton
+    <com.linroid.sky31radio.view.PlayPauseButton
         android:id="@+id/action_button_play"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -55,4 +55,4 @@
         android:max="100"
         android:progressDrawable="@drawable/circular_drawable" />
 
-</com.linroid.radio.view.PlayPauseProgressButton>
+</com.linroid.sky31radio.view.PlayPauseProgressButton>

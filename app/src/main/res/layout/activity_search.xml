@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.linroid.radio.ui.SearchActivity"
+    tools:context="com.linroid.sky31radio.ui.SearchActivity"
     android:orientation="vertical"
     android:fitsSystemWindows="true">
     <include layout="@layout/toolbar"/>
