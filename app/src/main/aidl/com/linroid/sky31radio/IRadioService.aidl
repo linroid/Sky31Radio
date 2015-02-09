@@ -1,6 +1,6 @@
 // IRadioService.aidl
-package com.linroid.radio;
-import com.linroid.radio.model.Program;
+package com.linroid.sky31radio;
+import com.linroid.sky31radio.model.Program;
 interface IRadioService {
     void play();
     void pause();
