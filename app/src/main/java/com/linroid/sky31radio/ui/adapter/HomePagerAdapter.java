@@ -7,8 +7,10 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.linroid.sky31radio.R;
 import com.linroid.sky31radio.ui.fragment.AlbumListFragment;
-import com.linroid.sky31radio.ui.fragment.ProgramListFragment;
 import com.linroid.sky31radio.ui.fragment.AnchorListFragment;
+import com.linroid.sky31radio.ui.fragment.ProgramListFragment;
+
+import timber.log.Timber;
 
 /**
  * Created by linroid on 1/14/15.
@@ -23,6 +25,7 @@ public class HomePagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         Fragment fragment;
+        Timber.d("getItem:%d", position);
         switch (position){
             case 0:
                 fragment = AnchorListFragment.newInstance();

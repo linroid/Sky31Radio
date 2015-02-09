@@ -18,6 +18,10 @@
                 android:data="http://xtuers.com"/>
         </Preference>
     </PreferenceCategory>
+    <PreferenceCategory android:title="感谢">
+        <Preference android:title="会哥"
+            android:summary="图标设计"/>
+    </PreferenceCategory>
     <PreferenceCategory android:title="贡献">
         <Preference
             android:key="@string/pref_feedback"

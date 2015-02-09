@@ -8,13 +8,13 @@
     card:cardElevation="2dp"
     card:cardCornerRadius="2dp"
     card:cardUseCompatPadding="true"
-    android:background="?selectableItemBackground"
+    android:layout_margin="4dp"
     android:foreground="?selectableItemBackground">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-        <ImageView
+        <com.linroid.sky31radio.view.SquareImageView
             android:id="@+id/album_thumbnail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

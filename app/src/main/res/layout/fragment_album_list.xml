@@ -6,10 +6,7 @@
         android:id="@id/content_loader"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="4dp"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:paddingBottom="8dp"
+        android:padding="4dp"
         android:clipToPadding="false"/>
     <include layout="@layout/toolbar_shadow"
         android:layout_height="@dimen/shadow_height"

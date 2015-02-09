@@ -4,6 +4,8 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -49,6 +51,14 @@ public class ContentLoaderView extends FrameLayout implements SwipeRefreshLayout
     private int paddingTop;
     private int paddingBottom;
     private boolean clipToPadding;
+
+    public static final String DISPLAY_STATE = "display_state";
+    public static final int STATE_CONTENT = 0x1;
+    public static final int STATE_LOADING = 0x2;
+    public static final int STATE_EMPTY = 0x3;
+    public static final int STATE_ERROR = 0x4;
+    private int displayState = STATE_LOADING;
+
     public ContentLoaderView(Context context) {
         super(context);
         initViews();
@@ -113,7 +123,7 @@ public class ContentLoaderView extends FrameLayout implements SwipeRefreshLayout
             recyclerView.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
         }
         recyclerView.setClipToPadding(clipToPadding);
-        setDisplayView(loadingView);
+        setDisplayState(STATE_LOADING);
     }
 
     RecyclerView.OnScrollListener mRecyclerScrollListener = new RecyclerView.OnScrollListener() {
@@ -150,7 +160,7 @@ public class ContentLoaderView extends FrameLayout implements SwipeRefreshLayout
     public void setAdapter(RecyclerView.Adapter adapter){
         recyclerView.setAdapter(adapter);
         if(adapter.getItemCount()> 0){
-            setDisplayView(contentView);
+            setDisplayState(STATE_CONTENT);
         }
         adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
@@ -189,9 +199,9 @@ public class ContentLoaderView extends FrameLayout implements SwipeRefreshLayout
                     if(loadMore){
                         loadMoreCompleted();
                     }
-                    setDisplayView(contentView);
+                    setDisplayState(STATE_CONTENT);
                 }else{
-                    setDisplayView(emptyView);
+                    setDisplayState(STATE_EMPTY);
                 }
                 if(refreshLayout.isRefreshing()){
                     refreshLayout.setRefreshing(false);
@@ -202,7 +212,7 @@ public class ContentLoaderView extends FrameLayout implements SwipeRefreshLayout
 //    @OnClick(R.id.btn_retry)
     public void onRetryButtonClick(){
         refreshLayout.setRefreshing(true);
-        setDisplayView(contentView);
+        setDisplayState(STATE_CONTENT);
         if(refreshListener !=null){
             refreshListener.onRefresh(false);
         }
@@ -215,16 +225,16 @@ public class ContentLoaderView extends FrameLayout implements SwipeRefreshLayout
         loadMore = false;
         if(currentPage==1 && recyclerView.getLayoutManager().getChildCount() == 0){
             errorMessageTV.setText(error.getMessage());
-            setDisplayView(errorView);
+            setDisplayState(STATE_ERROR);
         }else{
-            setDisplayView(contentView);
+            setDisplayState(STATE_CONTENT);
             Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
     private void loadMoreCompleted(){
         loadMore = false;
         refreshLayout.setEnabled(true);
-        setDisplayView(contentView);
+        setDisplayState(STATE_CONTENT);
     }
 
     public void setMoreListener(OnMoreListener moreListener) {
@@ -236,11 +246,12 @@ public class ContentLoaderView extends FrameLayout implements SwipeRefreshLayout
         this.totalPage = totalPage;
     }
 
-    private void setDisplayView(View view){
-        loadingView.setVisibility(view==loadingView ? VISIBLE : GONE);
-        emptyView.setVisibility(view==emptyView ? VISIBLE : GONE);
-        errorView.setVisibility(view==errorView ? VISIBLE : GONE);
-        contentView.setVisibility(view == contentView ? VISIBLE : GONE);
+    private void setDisplayState(int state){
+        this.displayState = state;
+        loadingView.setVisibility(state==STATE_LOADING ? VISIBLE : GONE);
+        emptyView.setVisibility(state==STATE_EMPTY ? VISIBLE : GONE);
+        errorView.setVisibility(state==STATE_ERROR ? VISIBLE : GONE);
+        contentView.setVisibility(state == STATE_CONTENT ? VISIBLE : GONE);
     }
     public void setOnRefreshListener(OnRefreshListener refreshListener) {
         this.refreshListener = refreshListener;
@@ -255,8 +266,20 @@ public class ContentLoaderView extends FrameLayout implements SwipeRefreshLayout
         }
     }
 
-    public boolean isLoadMore() {
-        return loadMore;
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        Parcelable parcelable = super.onSaveInstanceState();
+        SavedState savedState = new SavedState(parcelable);
+        savedState.state = this.displayState;
+        return savedState;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        SavedState savedState = (SavedState) state;
+        super.onRestoreInstanceState(savedState.getSuperState());
+        this.displayState = savedState.state;
+        setDisplayState(this.displayState);
     }
 
     @Override
@@ -264,7 +287,7 @@ public class ContentLoaderView extends FrameLayout implements SwipeRefreshLayout
         switch (v.getId()){
             case R.id.btn_error_retry:
             case R.id.btn_empty_retry:{
-                setDisplayView(loadingView);
+                setDisplayState(STATE_LOADING);
                 onRefresh();
                 break;
             }
@@ -277,5 +300,40 @@ public class ContentLoaderView extends FrameLayout implements SwipeRefreshLayout
     }
     public static interface OnMoreListener {
         void onMore(int page);
+    }
+
+
+    static class SavedState extends BaseSavedState{
+        private int state;
+        SavedState(Parcelable superState) {
+            super(superState);
+        }
+
+        public SavedState(Parcel source) {
+            super(source);
+            try {
+                state = source.readInt();
+            } catch (IllegalArgumentException e) {
+                state = STATE_LOADING;
+            }
+        }
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            super.writeToParcel(out, flags);
+            out.writeInt(state);
+        }
+
+        public static final Creator<SavedState> CREATOR =
+            new Creator<SavedState>() {
+                @Override
+                public SavedState createFromParcel(Parcel in) {
+                    return new SavedState(in);
+                }
+
+                @Override
+                public SavedState[] newArray(int size) {
+                    return new SavedState[size];
+                }
+            };
     }
 }

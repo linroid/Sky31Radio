@@ -8,12 +8,9 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.widget.Toast;
 
-import com.avos.avoscloud.PushService;
 import com.avos.avoscloud.feedback.FeedbackAgent;
 import com.linroid.sky31radio.BuildConfig;
-import com.linroid.sky31radio.Constants;
 import com.linroid.sky31radio.R;
-import com.linroid.sky31radio.ui.HomeActivity;
 
 import de.psdev.licensesdialog.LicensesDialog;
 
@@ -47,18 +44,6 @@ public class SettingsFragment extends PreferenceFragment {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 openDonate();
-                return true;
-            }
-        });
-        findPreference(getString(R.string.pref_allow_new_program_notification)).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                boolean enableNewProgramNotification = (Boolean)newValue;
-                if(enableNewProgramNotification){
-                    PushService.subscribe(getActivity(), Constants.CHANNEL_NEW_PROGRAM, HomeActivity.class);
-                }else{
-                    PushService.unsubscribe(getActivity(), Constants.CHANNEL_NEW_PROGRAM);
-                }
                 return true;
             }
         });

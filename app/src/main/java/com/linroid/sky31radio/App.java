@@ -33,10 +33,9 @@ public class App extends Application
     public void onCreate() {
         super.onCreate();
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
-        Timber.Tree tree = BuildConfig.DEBUG ? new Timber.DebugTree() : new Timber.HollowTree();
-        Timber.plant(tree);
         mObjectGraph = ObjectGraph.create(getModules().toArray());
         inject(this);
+        Timber.plant(tree);
         initLeancloud();
     }
 
@@ -72,6 +71,7 @@ public class App extends Application
     }
     private void setNotification(SharedPreferences sharedPreferences){
         boolean enableNotification = sharedPreferences.getBoolean(getString(R.string.pref_allow_new_program_notification), true);
+        Timber.d("setNotification:%s",String.valueOf(enableNotification));
         if(enableNotification){
             PushService.subscribe(this, Constants.CHANNEL_NEW_PROGRAM, HomeActivity.class);
         }else{

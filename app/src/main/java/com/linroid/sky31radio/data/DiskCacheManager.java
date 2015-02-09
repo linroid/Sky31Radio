@@ -58,7 +58,7 @@ public class DiskCacheManager {
             editor.commit();
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            Timber.e(e, "put %s data to cache manager failed", key);
         }
         return false;
     }
