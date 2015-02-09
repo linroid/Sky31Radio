@@ -9,6 +9,7 @@
         android:id="@+id/thumbnail"
         android:layout_width="@dimen/collapsed_notification_height"
         android:layout_height="@dimen/collapsed_notification_height"
+        android:padding="8dp"
         tools:src="@drawable/ic_launcher_square"
         android:scaleType="centerCrop"/>
     <TextView
@@ -17,7 +18,6 @@
         android:layout_height="@dimen/collapsed_notification_height"
         android:layout_weight="1"
         android:gravity="center_vertical"
-        android:layout_marginLeft="8dp"
         tools:text="我们活在一个现实的世里"
         android:layout_gravity="center_vertical"
         android:textColor="@android:color/white"
