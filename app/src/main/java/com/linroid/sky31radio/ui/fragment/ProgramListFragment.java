@@ -160,7 +160,8 @@ public class ProgramListFragment extends InjectableFragment implements ContentLo
                                 }
                             }
                         }
-                    }));
+                    })
+            ).subscribe(observer);
         }
         AppObservable.bindFragment(this, apiService.listPrograms(page, conditions))
                 .map(new Func1<Pagination<Program>, Pagination<Program>>() {
