@@ -58,7 +58,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import rx.Observer;
-import rx.Subscription;
+import rx.android.app.AppObservable;
 import rx.android.schedulers.AndroidSchedulers;
 import timber.log.Timber;
 
@@ -127,7 +127,6 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
 
     public static final int MSG_UPDATE = 0x1;
     private static final int MSG_SEEK = 0x2;
-    Subscription subscription;
 
     Handler handler = new Handler(){
         @Override
@@ -195,69 +194,19 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
         articleTV.setText(R.string.loading_article);
         picasso.load(program.getThumbnail())
                 .error(R.drawable.ic_launcher_square)
-                .into(new Target() {
-                    @Override
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        playerThumbnailIV.setImageBitmap(bitmap);
-                        ColorArt colorArt = new ColorArt(bitmap);
-                        int backgroundColor = colorArt.getBackgroundColor();
-                        statusColor = ColorUtils.transformIfTooWhite(backgroundColor);
-                        Timber.d("BackgroundColor: %s, statusColor:%s", Integer.toHexString(backgroundColor), Integer.toHexString(statusColor));
-                        if (slidingUpPanelLayout.isPanelExpanded()) {
-                            setStatusColor(statusColor);
-                        }
-
-                        int primaryColor = colorArt.getPrimaryColor();
-                        seekBar.setThumbColor(primaryColor, colorArt.getSecondaryColor());
-                        seekBar.setScrubberColor(primaryColor);
-                        seekBar.refreshDrawableState();
-                    }
-
-                    @Override
-                    public void onBitmapFailed(Drawable errorDrawable) {
-                        Timber.e("onBitmapFailed");
-                        playerThumbnailIV.setImageDrawable(errorDrawable);
-                    }
-
-                    @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-                        Timber.e("onPrepareLoad");
-                    }
-                });
+                .into(colorfulTarget);
         picasso.load(program.getCover())
                 .transform(new BlurTransformation(getActivity(), program.getCover()))
-                .into(new Target() {
-                    @Override
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        Timber.d("onBitmapLoaded: %s (%s)", from.name(), bitmap.toString());
-                        playerRootView.setBackgroundDrawable(new BitmapDrawable(getResources(), bitmap));
-                        centerThumbnailIV.setImageBitmap(bitmap);
-                    }
-
-                    @Override
-                    public void onBitmapFailed(Drawable errorDrawable) {
-                        Timber.e("onBitmapFailed");
-                    }
-
-                    @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-                        Timber.e("onPrepareLoad");
-                    }
-                });
-        subscription = apiService.programDetail(program.getId())
+                .into(coverTarget);
+        AppObservable.bindFragment(this, apiService.programDetail(program.getId()))
                     .observeOn(AndroidSchedulers.mainThread())
-
                     .subscribe(new Observer<Program>() {
                         @Override
                         public void onCompleted() {
-
                         }
-
                         @Override
                         public void onError(Throwable throwable) {
-
                         }
-
                         @Override
                         public void onNext(Program program) {
                             PlayerFragment.this.program = program;
@@ -389,6 +338,8 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        picasso.cancelRequest(colorfulTarget);
+        picasso.cancelRequest(coverTarget);
     }
 
     @Override
@@ -416,9 +367,6 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if(subscription!=null){
-            subscription.unsubscribe();
-        }
         ButterKnife.reset(this);
         handler.removeMessages(MSG_UPDATE);
     }
@@ -525,5 +473,51 @@ public class PlayerFragment extends InjectableFragment implements ServiceConnect
         }
     };
 
+    Target coverTarget = new Target() {
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            Timber.d("onBitmapLoaded: %s (%s)", from.name(), bitmap.toString());
+            playerRootView.setBackgroundDrawable(new BitmapDrawable(getResources(), bitmap));
+            centerThumbnailIV.setImageBitmap(bitmap);
+        }
 
+        @Override
+        public void onBitmapFailed(Drawable errorDrawable) {
+            Timber.e("onBitmapFailed");
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
+            Timber.e("onPrepareLoad");
+        }
+    };
+    Target colorfulTarget = new Target() {
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            playerThumbnailIV.setImageBitmap(bitmap);
+            ColorArt colorArt = new ColorArt(bitmap);
+            int backgroundColor = colorArt.getBackgroundColor();
+            statusColor = ColorUtils.transformIfTooWhite(backgroundColor);
+            Timber.d("BackgroundColor: %s, statusColor:%s", Integer.toHexString(backgroundColor), Integer.toHexString(statusColor));
+            if (slidingUpPanelLayout.isPanelExpanded()) {
+                setStatusColor(statusColor);
+            }
+
+            int primaryColor = colorArt.getPrimaryColor();
+            seekBar.setThumbColor(primaryColor, colorArt.getSecondaryColor());
+            seekBar.setScrubberColor(primaryColor);
+            seekBar.refreshDrawableState();
+        }
+
+        @Override
+        public void onBitmapFailed(Drawable errorDrawable) {
+            Timber.e("onBitmapFailed");
+            playerThumbnailIV.setImageDrawable(errorDrawable);
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
+            Timber.e("onPrepareLoad");
+        }
+    };
 }
