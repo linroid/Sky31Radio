@@ -23,7 +23,7 @@ import timber.log.Timber;
  * Created by linroid on 2/3/15.
  */
 public class ContentLoaderView extends FrameLayout implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
-    public static final int LOAD_MORE_ITEM_SLOP = 1;
+    public static final int LOAD_MORE_ITEM_SLOP = 4;
     View loadingView;
     View emptyView;
     View errorView;
