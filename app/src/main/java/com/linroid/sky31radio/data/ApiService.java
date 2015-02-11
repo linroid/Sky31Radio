@@ -5,7 +5,6 @@ import com.linroid.sky31radio.model.Anchor;
 import com.linroid.sky31radio.model.Pagination;
 import com.linroid.sky31radio.model.Program;
 
-import java.util.List;
 import java.util.Map;
 
 import retrofit.http.GET;
@@ -21,10 +20,10 @@ public interface ApiService {
     @GET("/program")
     Observable<Pagination<Program>> listPrograms(@Query("page") int page, @QueryMap Map<String, String> params);
     @GET("/album")
-    Observable<List<Album>> listAlbums();
+    Observable<Pagination<Album>> listAlbums(@Query("page") int page);
 
     @GET("/anchor")
-    Observable<List<Anchor>> listAnchor();
+    Observable<Pagination<Anchor>> listAnchor(@Query("page") int page);
 
     @GET("/program/{id}")
     Observable<Program> programDetail(@Path("id") int programId);

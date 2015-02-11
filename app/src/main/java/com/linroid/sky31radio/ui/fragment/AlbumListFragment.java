@@ -14,11 +14,13 @@ import com.linroid.sky31radio.R;
 import com.linroid.sky31radio.data.ApiService;
 import com.linroid.sky31radio.data.DiskCacheManager;
 import com.linroid.sky31radio.model.Album;
+import com.linroid.sky31radio.model.Pagination;
 import com.linroid.sky31radio.ui.adapter.AlbumAdapter;
 import com.linroid.sky31radio.ui.base.InjectableFragment;
 import com.linroid.sky31radio.view.ContentLoaderView;
 import com.squareup.picasso.Picasso;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,7 +76,7 @@ public class AlbumListFragment extends InjectableFragment implements ContentLoad
             List<Album> albumList = savedInstanceState.getParcelableArrayList(KEY_ALBUM);
             adapter.setListData(albumList);
         }else{
-            loadData();
+            loadData(1);
         }
     }
 
@@ -126,34 +128,35 @@ public class AlbumListFragment extends InjectableFragment implements ContentLoad
         super.onDetach();
         adapter.setOnAlbumSelectedListener(null);
     }
-    public void loadData(){
+    public void loadData(int page){
         if(!hasLoaded){
             AppObservable.bindFragment(this,
-                    Observable.create(new Observable.OnSubscribe<List<Album>>() {
+                    Observable.create(new Observable.OnSubscribe<Pagination<Album>>() {
                 @Override
-                public void call(Subscriber<? super List<Album>> subscriber) {
+                public void call(Subscriber<? super Pagination<Album>> subscriber) {
                     if (cacheManager.exits(DiskCacheManager.KEY_ALBUM)) {
-                        List<Album> albums = cacheManager.get(DiskCacheManager.KEY_ALBUM, new TypeToken<List<Album>>() {}.getType());
-                        if(albums!=null && albums.size()>0){
-                            subscriber.onNext(albums);
+                        Type type = new TypeToken<List<Album>>() {}.getType();
+                        Pagination<Album> cachedData = cacheManager.get(DiskCacheManager.KEY_ALBUM, type);
+                        if(cachedData!=null){
+                            subscriber.onNext(cachedData);
                         }
                     }
                 }
             })).subscribe(observer);
         }
-        AppObservable.bindFragment(this, apiService.listAlbums())
-                .map(new Func1<List<Album>, List<Album>>() {
+        AppObservable.bindFragment(this, apiService.listAlbums(page))
+                .map(new Func1<Pagination<Album>, Pagination<Album>>() {
                     @Override
-                    public List<Album> call(List<Album> albums) {
-                        cacheManager.put(DiskCacheManager.KEY_ALBUM, albums);
-                        return albums;
+                    public Pagination<Album> call(Pagination<Album> pagination) {
+                        cacheManager.put(DiskCacheManager.KEY_ALBUM, pagination);
+                        return pagination;
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observer);
     }
 
-    Observer<List<Album>> observer = new Observer<List<Album>>() {
+    Observer<Pagination<Album>> observer = new Observer<Pagination<Album>>() {
         @Override
         public void onCompleted() {
             Timber.i("listAlbum onCompleted");
@@ -166,15 +169,16 @@ public class AlbumListFragment extends InjectableFragment implements ContentLoad
         }
 
         @Override
-        public void onNext(List<Album> albums) {
+        public void onNext(Pagination<Album> pagination) {
             hasLoaded = true;
-            adapter.setListData(albums);
+            loaderView.setPage(pagination.getCurrentPage(), pagination.getLastPage());
+            adapter.setListData(pagination.getData());
             adapter.notifyDataSetChanged();
         }
     };
 
     @Override
     public void onRefresh(boolean fromSwipe) {
-        loadData();
+        loadData(1);
     }
 }

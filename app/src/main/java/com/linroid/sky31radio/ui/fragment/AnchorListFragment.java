@@ -14,6 +14,7 @@ import com.linroid.sky31radio.R;
 import com.linroid.sky31radio.data.ApiService;
 import com.linroid.sky31radio.data.DiskCacheManager;
 import com.linroid.sky31radio.model.Anchor;
+import com.linroid.sky31radio.model.Pagination;
 import com.linroid.sky31radio.ui.adapter.AnchorAdapter;
 import com.linroid.sky31radio.ui.base.InjectableFragment;
 import com.linroid.sky31radio.view.ContentLoaderView;
@@ -81,7 +82,7 @@ public class AnchorListFragment extends InjectableFragment implements ContentLoa
             List<Anchor> anchorList = savedInstanceState.getParcelableArrayList(KEY_USER);
             adapter.setListData(anchorList);
         }else{
-            loadData();
+            loadData(1);
         }
     }
 
@@ -128,17 +129,17 @@ public class AnchorListFragment extends InjectableFragment implements ContentLoa
         }
     }
 
-    public void loadData(){
+    public void loadData(final int page){
         if(!hasLoaded){
             AppObservable.bindFragment(this,
-                    Observable.create(new Observable.OnSubscribe<List<Anchor>>() {
+                    Observable.create(new Observable.OnSubscribe<Pagination<Anchor>>() {
                     @Override
-                    public void call(Subscriber<? super List<Anchor>> subscriber) {
+                    public void call(Subscriber<? super Pagination<Anchor>> subscriber) {
                         if (cacheManager.exits(DiskCacheManager.KEY_ANCHOR)) {
-                            Type type = new TypeToken<List<Anchor>>() { }.getType();
-                            List<Anchor> cachedData = cacheManager.get(DiskCacheManager.KEY_ANCHOR, type);
+                            Type type = new TypeToken<Pagination<Anchor>>() { }.getType();
+                            Pagination<Anchor> cachedData = cacheManager.get(DiskCacheManager.KEY_ANCHOR, type);
                             Timber.d("load data from cached file successful!");
-                            if(cachedData!=null && cachedData.size()>0) {
+                            if(cachedData!=null) {
                                 subscriber.onNext(cachedData);
                             }
                         }
@@ -147,18 +148,18 @@ public class AnchorListFragment extends InjectableFragment implements ContentLoa
             )
             .subscribe(observer);
         }
-        AppObservable.bindFragment(this, apiService.listAnchor())
-                .map(new Func1<List<Anchor>, List<Anchor>>() {
+        AppObservable.bindFragment(this, apiService.listAnchor(page))
+                .map(new Func1<Pagination<Anchor>, Pagination<Anchor>>() {
                     @Override
-                    public List<Anchor> call(List<Anchor> anchors) {
-                        cacheManager.put(DiskCacheManager.KEY_ANCHOR, anchors);
-                        return anchors;
+                    public Pagination<Anchor> call(Pagination<Anchor> pagination) {
+                        cacheManager.put(DiskCacheManager.KEY_ANCHOR, pagination);
+                        return pagination;
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observer);
     }
-    Observer<List<Anchor>> observer = new Observer<List<Anchor>>() {
+    Observer<Pagination<Anchor>> observer = new Observer<Pagination<Anchor>>() {
         @Override
         public void onCompleted() {
             Timber.i("listAnchor onCompleted");
@@ -171,16 +172,17 @@ public class AnchorListFragment extends InjectableFragment implements ContentLoa
         }
 
         @Override
-        public void onNext(List<Anchor> anchors) {
-            Timber.d("onNext %s", anchors.toString());
+        public void onNext(Pagination<Anchor> pagination) {
+            Timber.d("onNext %s", pagination.toString());
             hasLoaded = true;
-            adapter.setListData(anchors);
+            loaderView.setPage(pagination.getCurrentPage(), pagination.getLastPage());
+            adapter.setListData(pagination.getData());
             adapter.notifyDataSetChanged();
         }
     };
 
     @Override
     public void onRefresh(boolean fromSwipe) {
-        loadData();
+        loadData(1);
     }
 }
