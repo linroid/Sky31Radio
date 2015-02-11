@@ -48,7 +48,7 @@
     </notice>
     <notice>
         <name>RxAndroid</name>
-        <url>http://code.google.com/p/google-gson/</url>
+        <url>https://github.com/ReactiveX/RxAndroid</url>
         <copyright>Copyright 2014 Netflix</copyright>
         <license>Apache Software License 2.0</license>
     </notice>
