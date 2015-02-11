@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -11,8 +11,9 @@
     <fragment
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="bottom"
+        android:layout_marginTop="?actionBarSize"
         android:name="com.linroid.sky31radio.ui.fragment.SettingsFragment"
-        android:id="@+id/settings" />
-
-</LinearLayout>
+        android:id="@+id/settings"
+        tools:layout="@android:layout/list_content" />
+    <include layout="@layout/toolbar_shadow"/>
+</FrameLayout>
