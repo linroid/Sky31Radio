@@ -13,9 +13,9 @@
 
 ## 界面:
 - 主播列表
-    ![主播列表](./screenshots/device-2015-01-17-100644.png)
+    ![主播列表](./screenshots/device-2015-01-22-224854.png)
 - 节目列表
-	![节目列表](./screenshots/device-2015-01-17-102328.png)
+	![节目列表](./screenshots/device-2015-01-22-224820.png)
 - 播放器
     ![播放器](./screenshots/device-2015-02-07-141957.png)
 
