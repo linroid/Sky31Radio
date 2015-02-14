@@ -7,3 +7,5 @@
 signing.properties
 *.log
 *.apk
+.idea
+*.iml

@@ -36,10 +36,10 @@ public class App extends Application
         mObjectGraph = ObjectGraph.create(getModules().toArray());
         inject(this);
         Timber.plant(tree);
-        initLeancloud();
+        initLeanCloud();
     }
 
-    private void initLeancloud() {
+    private void initLeanCloud() {
         AVOSCloud.initialize(this, BuildConfig.LEANCLOUD_APP_ID,BuildConfig.LEANCLOUD_APP_KEY);
         AVInstallation.getCurrentInstallation().saveInBackground();
         PushService.setDefaultPushCallback(this, HomeActivity.class);

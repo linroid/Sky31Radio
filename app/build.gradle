@@ -1,19 +1,16 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.tmiyamon.mdicons'
 
 def releaseTime() {
     return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
 }
 
-
 // Manifest version information!
 def versionMajor = 1
 def versionMinor = 0
-def versionPatch = 0
+def versionPatch = 1
 def versionBuild = 0 // bump for dogfood builds, public betas, etc.
 def buildTime = new Date().format("yyyy-MM-dd HH:mm", TimeZone.getTimeZone("GMT+8:00"))
 
-def buglyAppId = "900001903"
 def wechatAppId = "wx0a74babb5d25de74"
 def leancloudAppId = "tppfzdpnnb99brtkh71phf5mkyba5t5wv8kw2n6tmy9wu45v"
 def leancloudAppKey = "f8s6xeebxw1qbqupgh8rjtuqb2nk1xfighsnwfl0zi71hcul"
@@ -40,7 +37,6 @@ android {
         renderscriptSupportModeEnabled true
 
         manifestPlaceholders = [LEANCLOUD_CHANNEL_ID: "default"]
-        buildConfigField "String", "BUGLY_APP_ID", "\"${buglyAppId}\""
         buildConfigField "String", "WECHAT_APP_ID", "\"${wechatAppId}\""
         buildConfigField "String", "LEANCLOUD_APP_ID", "\"${leancloudAppId}\""
         buildConfigField "String", "LEANCLOUD_APP_KEY", "\"${leancloudAppKey}\""
@@ -64,16 +60,16 @@ android {
             shrinkResources false
             minifyEnabled false
             zipAlignEnabled false
-            applicationVariants.all { variant ->
-                variant.outputs.each { output ->
-                    def outputFile = output.outputFile
-                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
-                        File outputDirectory = new File(outputFile.parent, "build/release");
-                        def fileName = "sky31_radio_v${defaultConfig.versionName}_${releaseTime()}_${variant.productFlavors[0].name}.apk"
-                        output.outputFile = new File(outputDirectory, fileName)
-                    }
-                }
-            }
+//            applicationVariants.all { variant ->
+//                variant.outputs.each { output ->
+//                    def outputFile = output.outputFile
+//                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+//                        File outputDirectory = new File(outputFile.parent, "build/release");
+//                        def fileName = "sky31_radio_v${defaultConfig.versionName}_${releaseTime()}_${variant.productFlavors[0].name}.apk"
+//                        output.outputFile = new File(outputDirectory, fileName)
+//                    }
+//                }
+//            }
             signingConfig signingConfigs.release
         }
         debug {
@@ -112,9 +108,6 @@ android {
 //configurations {
 //    all*.exclude group: 'com.android.support', module: 'support-v13'
 //}
-mdicons {
-    pattern '((pause|play_arrow|refresh|search)_white_24dp)|((pause|play_arrow)_white_48dp)'
-}
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     provided 'com.squareup.dagger:dagger-compiler:1.2.2'
