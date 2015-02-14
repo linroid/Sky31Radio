@@ -135,7 +135,7 @@ public class AlbumListFragment extends InjectableFragment implements ContentLoad
                 @Override
                 public void call(Subscriber<? super Pagination<Album>> subscriber) {
                     if (cacheManager.exits(DiskCacheManager.KEY_ALBUM)) {
-                        Type type = new TypeToken<List<Album>>() {}.getType();
+                        Type type = new TypeToken<Pagination<Album>>() {}.getType();
                         Pagination<Album> cachedData = cacheManager.get(DiskCacheManager.KEY_ALBUM, type);
                         if(cachedData!=null){
                             subscriber.onNext(cachedData);

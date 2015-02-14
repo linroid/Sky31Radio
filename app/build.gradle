@@ -60,16 +60,16 @@ android {
             shrinkResources false
             minifyEnabled false
             zipAlignEnabled false
-//            applicationVariants.all { variant ->
-//                variant.outputs.each { output ->
-//                    def outputFile = output.outputFile
-//                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
-//                        File outputDirectory = new File(outputFile.parent, "build/release");
-//                        def fileName = "sky31_radio_v${defaultConfig.versionName}_${releaseTime()}_${variant.productFlavors[0].name}.apk"
-//                        output.outputFile = new File(outputDirectory, fileName)
-//                    }
-//                }
-//            }
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    def outputFile = output.outputFile
+                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                        File outputDirectory = new File(outputFile.parent);
+                        def fileName = "sky31_radio_v${defaultConfig.versionName}_${releaseTime()}_${variant.productFlavors[0].name}.apk"
+                        output.outputFile = new File(outputDirectory, fileName)
+                    }
+                }
+            }
             signingConfig signingConfigs.release
         }
         debug {
