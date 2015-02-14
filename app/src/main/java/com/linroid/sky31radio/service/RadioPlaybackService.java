@@ -371,6 +371,9 @@ public class RadioPlaybackService extends Service implements AudioManager.OnAudi
         public void loadProgram() {
             isPlaying = true;
             Program program = programList.get(playingIndex);
+            if(program.getAudio()==null){
+                return;
+            }
             String url = program.getAudio().getSrc();
             Timber.i("loadProgram: %s(%s)", program.getTitle(), url);
             mediaPlayer.reset();
