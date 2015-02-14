@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.linroid.sky31radio.BuildConfig;
 import com.linroid.sky31radio.R;
 import com.linroid.sky31radio.data.ApiService;
+import com.linroid.sky31radio.data.FirService;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.internal.DiskLruCache;
@@ -95,26 +96,9 @@ public class DataModule {
     }
     @Provides
     @Singleton
-    RestAdapter provideRestAdapter(Gson gson, OkHttpClient okHttpClient, final Context ctx){
+    RestAdapter provideRestAdapter(Gson gson, OkHttpClient okHttpClient, ErrorHandler errorHandler){
         return new RestAdapter.Builder()
-                .setErrorHandler(new ErrorHandler() {
-                    @Override
-                    public Throwable handleError(RetrofitError retrofitError) {
-                        Timber.e(retrofitError, "请求出现错误:%s", retrofitError.getUrl());
-                        RetrofitError.Kind kind = retrofitError.getKind();
-                        String message;
-                        if(RetrofitError.Kind.NETWORK.equals(kind)){
-                            message = ctx.getString(R.string.network_error);
-                        }else if(RetrofitError.Kind.HTTP.equals(kind)){
-                            message = ctx.getString(R.string.http_error);
-                        }else if(RetrofitError.Kind.CONVERSION.equals(kind)){
-                            message = ctx.getString(R.string.conversion_error);
-                        }else{
-                            message = ctx.getString(R.string.unexpected_error);
-                        }
-                        return new Exception(message);
-                    }
-                })
+                .setErrorHandler(errorHandler)
                 .setClient(new OkClient(okHttpClient))
                 .setConverter(new GsonConverter(gson))
                 .setLogLevel(RestAdapter.LogLevel.BASIC)
@@ -123,8 +107,42 @@ public class DataModule {
     }
     @Provides
     @Singleton
+    ErrorHandler provideErrorHandler(final Context ctx){
+        return new ErrorHandler() {
+            @Override
+            public Throwable handleError(RetrofitError retrofitError) {
+                Timber.e(retrofitError, "请求出现错误:%s", retrofitError.getUrl());
+                RetrofitError.Kind kind = retrofitError.getKind();
+                String message;
+                if(RetrofitError.Kind.NETWORK.equals(kind)){
+                    message = ctx.getString(R.string.network_error);
+                }else if(RetrofitError.Kind.HTTP.equals(kind)){
+                    message = ctx.getString(R.string.http_error);
+                }else if(RetrofitError.Kind.CONVERSION.equals(kind)){
+                    message = ctx.getString(R.string.conversion_error);
+                }else{
+                    message = ctx.getString(R.string.unexpected_error);
+                }
+                return new Exception(message);
+            }
+        };
+    }
+    @Provides
+    @Singleton
     ApiService provideApiService(RestAdapter restAdapter){
         return restAdapter.create(ApiService.class);
+    }
+    @Provides
+    @Singleton
+    FirService provideFirService(Gson gson, OkHttpClient okHttpClient, ErrorHandler errorHandler){
+        RestAdapter restAdapter =  new RestAdapter.Builder()
+                .setErrorHandler(errorHandler)
+                .setClient(new OkClient(okHttpClient))
+                .setConverter(new GsonConverter(gson))
+                .setLogLevel(RestAdapter.LogLevel.BASIC)
+                .setEndpoint("http://fir.im/api/v2")
+                .build();
+        return  restAdapter.create(FirService.class);
     }
 
 }
