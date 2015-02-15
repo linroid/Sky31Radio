@@ -63,7 +63,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         tools:visibility="gone"
-                        app:waveColor="#66FFFFFF"
+                        app:waveColor="#FFFFFF"
                         app:waveWidth="16dp"
                         app:waveDividerWidth="8dp"/>
                 </FrameLayout>

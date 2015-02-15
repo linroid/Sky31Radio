@@ -7,7 +7,7 @@ def releaseTime() {
 // Manifest version information!
 def versionMajor = 1
 def versionMinor = 0
-def versionPatch = 1
+def versionPatch = 2
 def versionBuild = 0 // bump for dogfood builds, public betas, etc.
 def buildTime = new Date().format("yyyy-MM-dd HH:mm", TimeZone.getTimeZone("GMT+8:00"))
 

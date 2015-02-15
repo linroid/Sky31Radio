@@ -57,7 +57,7 @@ public class EqualizerView extends View{
         Resources res = getResources();
         waveWidth = ta.getDimensionPixelOffset(R.styleable.EqualizerView_waveWidth, TypedValue.complexToDimensionPixelSize(32, res.getDisplayMetrics()));
         waveDividerWidth = ta.getDimensionPixelSize(R.styleable.EqualizerView_waveDividerWidth, TypedValue.complexToDimensionPixelSize(32, res.getDisplayMetrics()));
-        int waveColor = ta.getColor(R.styleable.EqualizerView_waveColor, Color.parseColor("#66FFFFFF"));
+        int waveColor = ta.getColor(R.styleable.EqualizerView_waveColor, Color.parseColor("#99FFFFFF"));
 
         wavePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         wavePaint.setStrokeWidth(waveWidth);

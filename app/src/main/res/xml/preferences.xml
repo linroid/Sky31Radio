@@ -50,7 +50,6 @@
             <intent android:action="android.intent.action.VIEW"
                 android:data="http://linroid.com"/>
             </Preference>
-        <Preference  android:key="@string/pref_version_ame" android:title="版本"/>
         <Preference  android:key="@string/pref_check_version" android:title="检查新版本"/>
         <Preference  android:key="@string/pref_build_time" android:title="构建时间"/>
         <Preference  android:key="@string/pref_license" android:title="开源协议"/>

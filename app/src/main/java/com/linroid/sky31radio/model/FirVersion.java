@@ -31,6 +31,9 @@ public class FirVersion {
     private String name;
     @Expose
     private Integer version;
+    @SerializedName("changelog")
+    @Expose
+    private String changeLog;
     @Expose
     private String versionShort;
     @Expose
@@ -73,6 +76,24 @@ public class FirVersion {
      */
     public void setVersion(Integer version) {
         this.version = version;
+    }
+
+    /**
+     *
+     * @return
+     * The changeLog
+     */
+    public String getChangeLog() {
+        return changeLog;
+    }
+
+    /**
+     *
+     * @param changeLog
+     * The changeLog
+     */
+    public void setChangeLog(String changeLog) {
+        this.changeLog = changeLog;
     }
 
     /**

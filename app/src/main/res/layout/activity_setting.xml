@@ -9,11 +9,14 @@
     android:fitsSystemWindows="true">
     <include layout="@layout/toolbar" />
     <fragment
+        android:id="@+id/settings"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?actionBarSize"
         android:name="com.linroid.sky31radio.ui.fragment.SettingsFragment"
-        android:id="@+id/settings"
         tools:layout="@android:layout/list_content" />
-    <include layout="@layout/toolbar_shadow"/>
+    <include layout="@layout/toolbar_shadow"
+        android:layout_marginTop="?actionBarSize"
+        android:layout_height="@dimen/shadow_height"
+        android:layout_width="match_parent" />
 </FrameLayout>

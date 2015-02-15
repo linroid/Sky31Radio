@@ -41,7 +41,6 @@ public class SettingsFragment extends PreferenceFragment {
         getActivity();
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
-        findPreference(getString(R.string.pref_version_ame)).setSummary(BuildConfig.VERSION_NAME);
         findPreference(getString(R.string.pref_build_time)).setSummary(BuildConfig.BUILD_TIME);
 
         Preference checkVersionPref = findPreference(getString(R.string.pref_check_version));
@@ -97,7 +96,7 @@ public class SettingsFragment extends PreferenceFragment {
 
             @Override
             public void onNext(FirVersion firVersion) {
-                if(firVersion.getVersion() > BuildConfig.VERSION_CODE){
+                if(firVersion.getVersion()> BuildConfig.VERSION_CODE){
                     dialog.dismiss();
                     showNewVersionFoundDialog(firVersion);
                 }else{
@@ -110,7 +109,7 @@ public class SettingsFragment extends PreferenceFragment {
     private void showNewVersionFoundDialog(final FirVersion newFirVersion) {
         new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.title_new_version_found)
-                .setMessage(getString(R.string.msg_new_version_found, newFirVersion.getVersionShort(), newFirVersion.getVersion()))
+                .setMessage(getString(R.string.msg_new_version_found, newFirVersion.getVersionShort(), newFirVersion.getVersion(), newFirVersion.getChangeLog()))
                 .setPositiveButton(R.string.btn_dialog_update, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
