@@ -1,5 +1,8 @@
 # 湘潭大学三翼校园"四季电台"客户端
+[下载](http://fir.im/sky31radio)
 
+##介绍
+---
 四季电台是一款学院风的电台应用软件。
 校园网络电台一枚，
 各色主播可供调戏。
@@ -12,6 +15,7 @@
 邮箱：radiosky31@qq.com
 
 ## 界面:
+---
 - 主播列表
     ![主播列表](./screenshots/device-2015-01-22-224854.png)
 - 节目列表
@@ -20,6 +24,7 @@
     ![播放器](./screenshots/device-2015-02-07-141957.png)
 
 ## License
+---
 Copyright 2015 linroid
 
 Licensed under the Apache License, Version 2.0 (the "License");
