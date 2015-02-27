@@ -52,6 +52,6 @@
             </Preference>
         <Preference  android:key="@string/pref_check_version" android:title="检查新版本"/>
         <Preference  android:key="@string/pref_build_time" android:title="构建时间"/>
-        <Preference  android:key="@string/pref_license" android:title="开源协议"/>
+        <Preference  android:key="@string/pref_license" android:title="开放源代码许可"/>
     </PreferenceCategory>
 </PreferenceScreen>
