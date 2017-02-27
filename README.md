@@ -16,11 +16,14 @@
 
 ## 界面:
 - 主播列表
-    ![主播列表](./screenshots/device-2015-01-22-224854.png)
+
+    <img src="./screenshots/device-2015-01-22-224854.png" alt="主播列表" title="screenshot" height="500" />
 - 节目列表
-	![节目列表](./screenshots/device-2015-01-22-224820.png)
+
+	<img src="./screenshots/device-2015-01-22-224820.png" alt="节目列表" title="screenshot" height="500" />
 - 播放器
-    ![播放器](./screenshots/device-2015-02-07-141957.png)
+
+    <img src="./screenshots/device-2015-02-07-141957.png" alt="播放器" title="screenshot" height="500" />
 
 ## License
 Copyright 2015 linroid
